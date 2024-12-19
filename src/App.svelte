@@ -1,15 +1,20 @@
 <script>
-  import Header from "./components/Header.svelte";
+  import Home from "./pages/Home.svelte";
 </script>
 
 <main>
-  <Header title="Welcome to Neothink" />
-  <p>This is your Svelte app!</p>
+  <Home />
 </main>
 
 <style>
-  main {
+  :global(body) {
+    margin: 0;
     font-family: Arial, sans-serif;
-    padding: 1rem;
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
 </style>
