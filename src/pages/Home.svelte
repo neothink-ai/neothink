@@ -68,9 +68,9 @@
     </div>
     <nav class="header-nav">
       <a href="#">Product</a>
-      <a href="#">Teams</a>
-      <a href="#">Individuals</a>
-      <a href="#">Pricing</a>
+      <a href="SignUp.svelte">Sign Up</a>
+      <a href="Login.svelte">Log In</a>
+      <a href="#">Team</a>
     </nav>
   </header>
 
