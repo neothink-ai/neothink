@@ -1,10 +1,37 @@
 <script>
-  import Home from "./pages/Home.svelte";
+  import { onMount } from 'svelte';
+  import { navigate, Router, Route } from "svelte-routing";
+  import SignUp from './routes/signup/SignUp.svelte';
+  import Dashboard from '../src/components/Dashboard.svelte';
+  import Home from '../src/pages/Home.svelte';
+  import {user, loading} from '../src/lib/stores/authStore';
+
+  onMount(() => {
+        return user.subscribe(($user) => {
+            if (!$loading && $user) {
+                navigate('/dashboard');
+            }
+        });
+    });
 </script>
 
-<main>
+<!-- {#if $loading}
+    <div class="loading">Loading...</div>
+{:else}
+    {#if $user}
+        <Dashboard />
+    {/if}
+{/if} -->
+
+
+<Router>
+  <Route path = '/' component = {Home}/>
+  <Route path = '/signup' component = {SignUp}/>
+  <Route path = '/dashboard' component = {Dashboard} />
+</Router>
+<!-- <main>
   <Home />
-</main>
+</main> -->
 
 <style>
   :global(body) {

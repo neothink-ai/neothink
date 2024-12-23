@@ -1,7 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import lottie from "lottie-web";
-
+  import { navigate, Router, Route } from "svelte-routing";
+  import SignUp from "../routes/signup/SignUp.svelte";
   let animationContainer;
 
   // Load the Lottie animation on mount
@@ -60,6 +61,10 @@
   ];
 </script>
 
+<Router>
+  <Route path="/signup" component={SignUp} />
+</Router>
+
 <div class="container">
   <!-- Header -->
   <header class="header">
@@ -82,7 +87,9 @@
     <div class="main-content">
       <div class="animation-container" bind:this={animationContainer}></div>
       <div class="buttons-container">
-        <button class="button primary">Sign Up</button>
+        <button on:click={() => navigate("./signup")} class="button primary"
+          >Sign Up</button
+        >
         <button class="button secondary">Learn More</button>
       </div>
     </div>
