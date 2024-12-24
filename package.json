@@ -27,6 +27,7 @@
 	"type": "module",
 	"dependencies": {
 		"firebase": "^10.7.1",
-		"lottie-web": "^5.12.2"
+		"lottie-web": "^5.12.2",
+		"svelte-routing": "^2.13.0"
 	}
 }

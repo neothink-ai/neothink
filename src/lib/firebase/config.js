@@ -1,9 +1,10 @@
 // Replace these with your Firebase config
 export const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-auth-domain",
-  projectId: "your-project-id",
-  storageBucket: "your-storage-bucket",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id"
+  apiKey: "AIzaSyD6Fyb8ScXjI9wmgeriDKMayJT_ThIGAak",
+  authDomain: "neothink-auth.firebaseapp.com",
+  projectId: "neothink-auth",
+  storageBucket: "neothink-auth.firebasestorage.app",
+  messagingSenderId: "543003675239",
+  appId: "1:543003675239:web:d306181cb61e0a990d22c2",
+  measurementId: "G-690T7S0441"
 };

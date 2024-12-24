@@ -1,6 +1,6 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { navigate } from 'svelte-routing';
 	
 	// Redirect to landing page
-	goto('/landing-page');
+	navigate('/landing-page');
 </script>
