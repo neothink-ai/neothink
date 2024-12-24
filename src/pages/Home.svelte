@@ -3,6 +3,7 @@
   import lottie from "lottie-web";
   import { navigate, Router, Route } from "svelte-routing";
   import SignUp from "../routes/signup/SignUp.svelte";
+  <Route path="/signup" component={SignUp} />;
   let animationContainer;
 
   // Load the Lottie animation on mount
@@ -73,7 +74,7 @@
     </div>
     <nav class="header-nav">
       <a href="#">Product</a>
-      <a href="SignUp.svelte">Sign Up</a>
+      <a href="/signup">Sign Up</a>
       <a href="Login.svelte">Log In</a>
       <a href="#">Team</a>
     </nav>
