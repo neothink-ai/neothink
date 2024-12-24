@@ -1,41 +1,39 @@
 <script>
-  import { Router, Route } from "svelte-routing"; // Add Route here
-  import { navigate } from "svelte-routing";
   import { authHandlers, error } from "../../lib/stores/authStore";
-  import Login from "./Login.svelte";
+  import { navigate } from "svelte-routing";
+  import { Router, Route } from "svelte-routing"; // Add Route here
+  import SignUp from "./SignUp.svelte";
 
   let email = "";
   let password = "";
 
-  // Handle Signup
-  async function handleSignup() {
+  // Handle Login
+  async function handleLogin() {
     try {
-      await authHandlers.signup(email, password);
+      await authHandlers.login(email, password);
       // Redirect to home page or dashboard
       window.location.href = "/";
     } catch (err) {
-      console.error("Signup failed:", err);
+      console.error("Login failed:", err);
+      $error = "Invalid email or password.";
     }
   }
 
-  // Handle Google SignUp
+  // Handle Google Login
   async function handleGoogleAuth() {
     try {
-      const user = await authHandlers.signupWithGoogle();
-      console.log("User signed up with Google:", user);
+      const user = await authHandlers.loginWithGoogle();
+      console.log("User logged in with Google:", user);
       window.location.href = "/"; // Redirect on success
     } catch (err) {
-      console.error("Google sign-up failed:", err);
+      console.error("Google login failed:", err);
     }
   }
 </script>
 
-<!-- Full Background Container -->
-<div class="full-background"></div>
-
 <!-- Router Wrapper -->
 <Router>
-  <Route path="/login" component={Login} />
+  <Route path="/signup" component={SignUp} />
 </Router>
 
 <!-- Loader Section -->
@@ -43,13 +41,13 @@
   <div class="spinner"></div>
 </div>
 
-<!-- Main Container (Sign Up Form) -->
+<!-- Main Container (Login Form) -->
 <div class="container">
   <div class="header">
     <img src="assets/neothink.png" alt="Logo" class="logo" />
   </div>
-  <h2>Create Account</h2>
-  <form on:submit|preventDefault={handleSignup}>
+  <h2>Log In</h2>
+  <form on:submit|preventDefault={handleLogin}>
     <label for="email">Email</label>
     <input type="email" id="email" name="email" bind:value={email} required />
 
@@ -62,52 +60,40 @@
       required
     />
 
-    <button type="submit" id="submit">Sign Up</button>
+    <button type="submit" id="submit">Log In</button>
   </form>
 
   <!-- OAuth Buttons Section -->
   <div class="oauth-buttons">
     <button class="oauth google" on:click={handleGoogleAuth}>
-      <img src="assets/google.png" alt="Google Logo" class="oauth-logo" />
+      <img src="/assets/google.png" alt="Google Logo" class="oauth-logo" />
       Google
     </button>
-    <button class="oauth microsoft" id="microsoftSignUp">
-      <img src="assets/microsoft.png" alt="Microsoft Logo" class="oauth-logo" />
+    <button class="oauth microsoft" id="microsoftLogin">
+      <img
+        src="/assets/microsoft.png"
+        alt="Microsoft Logo"
+        class="oauth-logo"
+      />
       Microsoft
     </button>
-    <button class="oauth twitter" id="twitterSignUp">
-      <img src="assets/twitter.jpg" alt="Twitter Logo" class="oauth-logo" />
+    <button class="oauth twitter" id="twitterLogin">
+      <img src="/assets/twitter.jpg" alt="Twitter Logo" class="oauth-logo" />
       Twitter
     </button>
   </div>
 
   <p>
-    Already have an account?
-    <a on:click={() => navigate("/login")}>Log In</a>
-  </p>
+    Don't have an account? <a on:click={() => navigate("/signup")}>Log In</a>
 
-  {#if $error}
-    <p class="error">{$error}</p>
-  {/if}
+    {#if $error}
+      <p class="error">{$error}</p>
+    {/if}
+  </p>
 </div>
 
-<!-- Styles for Home.svelte -->
+<!-- Styles for Login.svelte -->
 <style>
-  /* Full Background with Transparency */
-  .full-background {
-    position: absolute;
-    top: 0;
-    bottom: 40%;
-    left: 20%;
-    width: 100%;
-    height: 100%;
-    background-image: url("/assets/feature1.png");
-    background-size: cover;
-    background-position: center;
-    opacity: 0.5; /* Adjust transparency here (0 is fully transparent, 1 is fully opaque) */
-    z-index: -1; /* Ensures the background stays behind other content */
-  }
-
   /* General Body Styles */
   body {
     font-family: Arial, sans-serif;
@@ -158,11 +144,11 @@
     opacity: 1;
   }
 
-  /* Container Style - Shifted Left and Moved Down (touching the top) */
+  /* Container Style */
   .container {
-    max-width: 350px; /* Smaller width */
-    margin-top: 1%; /* Moves the container to the top */
-    margin-left: 5%; /* Shifted towards the left */
+    max-width: 400px;
+    margin: 50px auto;
+    margin-top: 2%;
     background-color: #fff;
     padding: 20px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);

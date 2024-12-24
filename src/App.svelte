@@ -1,18 +1,20 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
   import { navigate, Router, Route } from "svelte-routing";
-  import SignUp from './routes/signup/SignUp.svelte';
-  import Dashboard from '../src/components/Dashboard.svelte';
-  import Home from '../src/pages/Home.svelte';
-  import {user, loading} from '../src/lib/stores/authStore';
+  import SignUp from "./routes/signup/SignUp.svelte";
+  import Dashboard from "../src/components/Dashboard.svelte";
+  import Home from "../src/pages/Home.svelte";
+  import Login from "./routes/signup/Login.svelte";
+  import { user, loading } from "../src/lib/stores/authStore";
+  import { component_subscribe } from "svelte/internal";
 
   onMount(() => {
-        return user.subscribe(($user) => {
-            if (!$loading && $user) {
-                navigate('/dashboard');
-            }
-        });
+    return user.subscribe(($user) => {
+      if (!$loading && $user) {
+        navigate("/dashboard");
+      }
     });
+  });
 </script>
 
 <!-- {#if $loading}
@@ -23,12 +25,13 @@
     {/if}
 {/if} -->
 
-
 <Router>
-  <Route path = '/' component = {Home}/>
-  <Route path = '/signup' component = {SignUp}/>
-  <Route path = '/dashboard' component = {Dashboard} />
+  <Route path="/" component={Home} />
+  <Route path="/signup" component={SignUp} />
+  <Route path="/dashboard" component={Dashboard} />
+  <Route path="/login" component={Login} />
 </Router>
+
 <!-- <main>
   <Home />
 </main> -->
