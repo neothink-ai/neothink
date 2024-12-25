@@ -33,7 +33,7 @@
   >
     <span class="text-gray-700">
       {#if $user}
-        {$user.firstName} {$user.lastName}
+        {$user.displayName}
       {:else}
         Loading...
       {/if}
@@ -45,7 +45,7 @@
     <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
       {#if $user}
         <div class="px-4 py-2 border-b border-gray-100">
-          <div class="font-medium">{$user.firstName} {$user.lastName}</div>
+          <div class="font-medium">{$user.displayName}</div>
           <div class="text-sm text-gray-500">{$user.email}</div>
         </div>
       {/if}

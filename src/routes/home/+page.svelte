@@ -8,10 +8,6 @@
 	<Sidebar />
 	
 	<main class="flex-1 p-8">
-		<div class="flex justify-end mb-8">
-			<ProfileMenu />
-		</div>
-		
 		<div class="max-w-3xl mx-auto">
 			<Calendar />
 		</div>

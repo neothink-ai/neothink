@@ -1,6 +1,6 @@
+
 <script>
-	import { Router, Route } from "svelte-routing"; // Add Route here
-	import { navigate } from "svelte-routing";
+	// Sign up page svelte
 	import { authHandlers, error } from "$lib/firebase/authStore";
 	import { signUp } from '$lib/firebase/auth';
   

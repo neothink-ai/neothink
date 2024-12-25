@@ -1,4 +1,5 @@
 <script>
+  // Root layout page
   import '../app.css';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
@@ -8,11 +9,13 @@
   
   onMount(() => {
     const unsubscribe = user.subscribe((currentUser) => {
-      if (currentUser && (window.location.pathname === '/landing-page' || window.location.pathname === '/sign-up')) {
-        goto('/home');
-      } else if (!currentUser && window.location.pathname.startsWith('/home')) {
-        goto('/landing-page');
-      }
+      const path = window.location.pathname;
+      const protectedRoutes = ['/home', '/teams'];
+      console.log("Current User: ", currentUser);
+      console.log("Display Name: ", currentUser?.displayName);
+      // if (!currentUser && protectedRoutes.some(route => path.startsWith(route))) {
+      //   goto('/');
+      // }
     });
     
     return () => {
@@ -20,16 +23,15 @@
     };
   });
 
-  $: showSidebar = $user && !['/landing-page', '/sign-up'].includes(window.location.pathname);
+  $: showSidebar = $user && ['/home', '/teams'].some(route => window.location.pathname.startsWith(route));
 </script>
 
 <div class="min-h-screen bg-gray-100">
   {#if showSidebar}
     <TopBar />
     <div class="flex">
-      <Sidebar />
       <main class="flex-1">
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="max-w-9x2 mx-auto py-6 sm:px-6 lg:px-8">
           <slot />
         </div>
       </main>
