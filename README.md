@@ -1,6 +1,6 @@
-# Project Name
+# Neothink
 
-This project is a Svelte application with a FastAPI backend.
+Neothink is an AI-powered project management software designed for enterprise use. It leverages advanced machine learning algorithms to streamline project workflows, enhance team collaboration, and provide actionable insights for better decision-making.
 
 ## Getting Started
 
@@ -8,12 +8,12 @@ This project is a Svelte application with a FastAPI backend.
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/neothink-ai/neothink.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd <neothink>
+   cd neothink
    ```
 
 3. Install the frontend dependencies:
