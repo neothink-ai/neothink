@@ -2,8 +2,6 @@
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/userStore';
   import { getUserProfile, updateUserProfile, getUserTeamsDetails } from '$lib/firebase/users';
-  import Sidebar from '../home/components/Sidebar.svelte';
-  import ProfileMenu from '../home/components/ProfileMenu.svelte';
 
   let profile = null;
   let teams = [];
@@ -20,11 +18,12 @@
         formData = {
           firstName: userData.firstName,
           lastName: userData.lastName,
+          department: userData.department,
           skills: [...userData.skills]
         };
         
         if (userData.teams?.length) {
-          teams = await getUserTeamsDetails(userData.teams);
+          teams = await Promise.all(userData.teams.map(teamId => getUserTeamsDetails(teamId)));
         }
       } catch (err) {
         error = err.message;
@@ -55,9 +54,7 @@
 </script>
 
 <div class="flex min-h-screen bg-gray-100">
-  
-  <main class="flex-1 p-8">
-
+  <main class="flex-1 p-8"></main>
     {#if loading}
       <div class="flex justify-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -81,19 +78,10 @@
         {#if editing}
           <form on:submit|preventDefault={handleSubmit} class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">First Name</label>
+              <label class="block text-sm font-medium text-gray-700">Department</label>
               <input
                 type="text"
-                bind:value={formData.firstName}
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Last Name</label>
-              <input
-                type="text"
-                bind:value={formData.lastName}
+                bind:value={formData.department}
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
@@ -135,18 +123,18 @@
         {:else}
           <div class="space-y-4">
             <div>
-              <h2 class="text-sm font-medium text-gray-500">Name</h2>
-              <p class="mt-1">{profile.firstName} {profile.lastName}</p>
+              <h2 class="text-sm font-medium text-gray-500">First Name</h2>
+              <p class="mt-1">{profile.firstName}</p>
             </div>
 
             <div>
-              <h2 class="text-sm font-medium text-gray-500">Email</h2>
-              <p class="mt-1">{profile.email}</p>
+              <h2 class="text-sm font-medium text-gray-500">Last Name</h2>
+              <p class="mt-1">{profile.lastName}</p>
             </div>
 
             <div>
-              <h2 class="text-sm font-medium text-gray-500">Date Joined</h2>
-              <p class="mt-1">{new Date(profile.dateJoined).toLocaleDateString()}</p>
+              <h2 class="text-sm font-medium text-gray-500">Department</h2>
+              <p class="mt-1">{profile.department}</p>
             </div>
 
             <div>
@@ -164,7 +152,7 @@
               <h2 class="text-sm font-medium text-gray-500">Teams</h2>
               <div class="mt-2 space-y-2">
                 {#each teams as team}
-                  <div class="p-3 bg-gray-50 rounded-lg">
+                  <div class="p-3 bg-gray-50 rounded-lg"></div>
                     <h3 class="font-medium">{team.name}</h3>
                     <p class="text-sm text-gray-600">Created: {new Date(team.createdAt).toLocaleDateString()}</p>
                   </div>

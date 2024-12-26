@@ -1,43 +1,29 @@
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from './firebase';
+import axios from 'axios';
 
-export async function getUserProfile(uid) {
+const BASE_URL = 'http://localhost:5000';
+
+export async function getUserProfile(userId) {
   try {
-    const userDoc = await getDoc(doc(db, 'users', uid));
-    if (!userDoc.exists()) {
-      throw new Error('User not found');
-    }
-    return { id: userDoc.id, ...userDoc.data() };
+    const response = await axios.get(`${BASE_URL}/fetch-user/${userId}`);
+    return response.data;
   } catch (error) {
     throw new Error('Error fetching user profile: ' + error.message);
   }
 }
 
-export async function updateUserProfile(uid, updates) {
+export async function updateUserProfile(userId, updates) {
   try {
-    const allowedUpdates = ['firstName', 'lastName', 'skills'];
-    const filteredUpdates = Object.keys(updates)
-      .filter(key => allowedUpdates.includes(key))
-      .reduce((obj, key) => {
-        obj[key] = updates[key];
-        return obj;
-      }, {});
-
-    await updateDoc(doc(db, 'users', uid), filteredUpdates);
+    const response = await axios.post(`${BASE_URL}/update-profile/${userId}`, updates);
+    return response.data;
   } catch (error) {
     throw new Error('Error updating user profile: ' + error.message);
   }
 }
 
-export async function getUserTeamsDetails(teamIds) {
+export async function getUserTeamsDetails(userId) {
   try {
-    const teamsRef = collection(db, 'teams');
-    const teamsQuery = query(teamsRef, where('__name__', 'in', teamIds));
-    const snapshot = await getDocs(teamsQuery);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const response = await axios.get(`${BASE_URL}/fetch-teams/${userId}`);
+    return response.data;
   } catch (error) {
     throw new Error('Error fetching user teams: ' + error.message);
   }
