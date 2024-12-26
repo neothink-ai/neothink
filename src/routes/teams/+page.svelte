@@ -1,9 +1,9 @@
 <script>
+  //teams page
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/userStore';
   import TeamList from './components/TeamList.svelte';
   import Sidebar from '../home/components/Sidebar.svelte';
-  import ProfileMenu from '../home/components/ProfileMenu.svelte';
   import { getUserTeams, getAllTeams } from '$lib/firebase/teams';
 
   let userTeams = [];
@@ -32,9 +32,6 @@
   <Sidebar />
   
   <main class="flex-1 p-8">
-    <div class="flex justify-end mb-8">
-      <ProfileMenu />
-    </div>
 
     {#if loading}
       <div class="flex justify-center">

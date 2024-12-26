@@ -1,5 +1,9 @@
 node_modules
 
+#python venv files
+backend/venv
+backend/__pycache__
+
 # Output
 .output
 .vercel

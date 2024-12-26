@@ -13,6 +13,7 @@
       const protectedRoutes = ['/home', '/teams'];
       console.log("Current User: ", currentUser);
       console.log("Display Name: ", currentUser?.displayName);
+      console.log("Uid: ", currentUser?.uid);
       // if (!currentUser && protectedRoutes.some(route => path.startsWith(route))) {
       //   goto('/');
       // }
@@ -31,7 +32,7 @@
     <TopBar />
     <div class="flex">
       <main class="flex-1">
-        <div class="max-w-9x2 mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="w-full max-w-9x2 mx-auto py-6 sm:px-6 lg:px-8">
           <slot />
         </div>
       </main>
