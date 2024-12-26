@@ -55,12 +55,8 @@
 </script>
 
 <div class="flex min-h-screen bg-gray-100">
-  <Sidebar />
   
   <main class="flex-1 p-8">
-    <div class="flex justify-end mb-8">
-      <ProfileMenu />
-    </div>
 
     {#if loading}
       <div class="flex justify-center">

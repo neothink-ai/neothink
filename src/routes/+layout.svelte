@@ -1,43 +1,22 @@
 <script>
-  // Root layout page
   import '../app.css';
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { user } from '$lib/stores/userStore';
-  import Sidebar from './home/components/Sidebar.svelte';
-  import TopBar from '$lib/components/TopBar.svelte';
-  
-  onMount(() => {
-    const unsubscribe = user.subscribe((currentUser) => {
-      const path = window.location.pathname;
-      const protectedRoutes = ['/home', '/teams'];
-      console.log("Current User: ", currentUser);
-      console.log("Display Name: ", currentUser?.displayName);
-      console.log("Uid: ", currentUser?.uid);
-      // if (!currentUser && protectedRoutes.some(route => path.startsWith(route))) {
-      //   goto('/');
-      // }
-    });
-    
-    return () => {
-      unsubscribe();
-    };
-  });
+  import CommonLayout from './CommonLayout.svelte';
+  import { page } from '$app/stores';
 
-  $: showSidebar = $user && ['/home', '/teams'].some(route => window.location.pathname.startsWith(route));
+  // Determine if the CommonLayout should be shown based on the route
+  $: showCommonLayout = ['/home', '/teams', '/about', '/neotaskmaster', '/neometrics'].some(route => $page.url.pathname.startsWith(route));
 </script>
 
 <div class="min-h-screen bg-gray-100">
-  {#if showSidebar}
-    <TopBar />
-    <div class="flex">
-      <main class="flex-1">
-        <div class="w-full max-w-9x2 mx-auto py-6 sm:px-6 lg:px-8">
-          <slot />
-        </div>
-      </main>
-    </div>
+  {#if showCommonLayout}
+    <CommonLayout>
+      <slot />
+    </CommonLayout>
   {:else}
-    <slot />
+    <main class="flex-1">
+      <div class="w-full py-6 sm:px-6 lg:px-8">
+        <slot />
+      </div>
+    </main>
   {/if}
 </div>
