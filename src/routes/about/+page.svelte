@@ -15,15 +15,15 @@
       try {
         const userData = await getUserProfile($user.uid);
         profile = userData;
-        console.log(typeof(profile))
-        console.log(profile)
+        // console.log(typeof(profile))
+        // console.log(profile)
         
         if (userData.teams?.length) {
           teams = await getUserTeamsDetails($user.uid);
         }
-        console.log(profile.teams);
-        console.log("teams: ");
-        console.log(teams);
+        // console.log(profile.teams);
+        // console.log("teams: ");
+        // console.log(teams);
       } catch (err) {
         error = err.message;
       } finally {

@@ -48,7 +48,7 @@ async def process_json(item: Item):
     response = requests.post("http://localhost:11434/api/generate", json=data, stream=False)
     json_data = json.loads(response.text)
 
-    print(json.dumps(json.loads(json_data["response"]), indent=2))
+    # print(json.dumps(json.loads(json_data["response"]), indent=2))
 
     return response
 
@@ -65,7 +65,7 @@ async def fetch_mongodb():
 
 @app.get("/fetch-user/{user_id}")
 async def fetch_user(user_id: str):
-    print(f"Received fetch-user request: {user_id}")
+    # print(f"Received fetch-user request: {user_id}")
     try:
         users_db = client["Users"]
         user_data_collection = users_db["user_data"]
@@ -80,7 +80,7 @@ async def fetch_user(user_id: str):
     
 @app.get("/fetch-teams/{user_id}")
 async def fetch_teams(user_id: str):
-    print(f"Received fetch-teams request: {user_id}")
+    # print(f"Received fetch-teams request: {user_id}")
     try:
         teams_db = client["Teams"]
         teams_collection = teams_db["teams"]
@@ -134,26 +134,26 @@ async def fetch_all_teams():
     
 @app.post("/update-profile/{user_id}")
 async def update_profile(user_id: str, profile: UserProfileUpdate):
+    # print(f"Received update-profile request: {user_id}")
+    # print("Profile data:")
+    # print(profile.model_dump_json())
+    # print(type(profile.model_dump()))
     try:
         users_db = client["Users"]
         user_data_collection = users_db["user_data"]
-        update_data = {
-            "user_id": user_id,
-            "first_name": profile.value.get("first_name"),
-            "last_name": profile.value.get("last_name"),
-            "department": profile.value.get("department"),
-            "skills": profile.value.get("skills", []),
-            "teams": profile.value.get("teams", [])
-        }
+        # print("Collection fetched. Performing update")
         result = user_data_collection.update_one(
             {"user_id": user_id},
-            {"$set": update_data},
+            {"$set": profile.model_dump()},
             upsert=True
         )
+        # print("Supposedly updated")
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="User not found")
         return {"status": "success"}
     except Exception as e:
+        # print("Encountered error: ")
+        # print(e)
         raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
