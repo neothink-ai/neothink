@@ -8,6 +8,7 @@
 
   const dispatch = createEventDispatcher();
   let newTaskTitle = '';
+  let isAddingTask = false;
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
@@ -41,14 +42,27 @@
   on:dragover={handleDragOver}
   role="list"
 >
-  <h2>{column.title}</h2>
-  <div class="task-input">
-    <input
-      placeholder="New task"
-      bind:value={newTaskTitle}
-      on:keyup="{e => e.key === 'Enter' && handleAddTask()}"
-    />
-    <button on:click={handleAddTask}>Add</button>
+  <div class="column-header">
+    <h2>{column.title}</h2>
+    <div class="add-task-trigger" on:mouseenter={() => isAddingTask = true}>
+      <span class="plus-icon">+</span>
+      {#if isAddingTask}
+        <div 
+          class="floating-input"
+          on:mouseleave={() => {
+            isAddingTask = false;
+            newTaskTitle = '';
+          }}
+        >
+          <input
+            placeholder="New task"
+            bind:value={newTaskTitle}
+            on:keyup="{e => e.key === 'Enter' && handleAddTask()}"
+          />
+          <button on:click={handleAddTask}>Add</button>
+        </div>
+      {/if}
+    </div>
   </div>
   <ul>
     {#each tasks.filter(task => task.columnId === column.id) as task}
@@ -76,6 +90,42 @@
     color: #172b4d;
     margin-bottom: 12px;
     padding: 0 4px;
+  }
+  .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .add-task-trigger {
+    position: relative;
+    cursor: pointer;
+  }
+  .plus-icon {
+    font-size: 20px;
+    color: #42526e;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+  .plus-icon:hover {
+    background-color: rgba(9, 30, 66, 0.08);
+  }
+  .floating-input {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    padding: 8px;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.25);
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+    min-width: 200px;
+  }
+  .task-input {
+    display: none;
   }
   .task-input {
     display: flex;
