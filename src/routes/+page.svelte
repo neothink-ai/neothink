@@ -6,7 +6,6 @@
 	let animation;
 
 	onMount(async () => {
-		animationContainer = document.getElementById('animate');
 		if (browser) {
 			const lottie = await import('lottie-web');
 			animation = lottie.default.loadAnimation({
@@ -14,59 +13,61 @@
 				renderer: "svg",
 				loop: true,
 				autoplay: true,
-				path: "/assets/ani1.json"
+				path: "/assets/ani2.json"
 			});
 		}
 	});
 
+	// Features data
 	const features = [
 		{
 			icon: "/assets/1.png",
 			title: "Workflows",
-			description: "Design workflows, share ideas."
+			description: "Design workflows, share ideas.",
 		},
 		{
 			icon: "/assets/2.png",
 			title: "Communication",
-			description: "Create smarter processes and communicate seamlessly."
+			description: "Create smarter processes and communicate seamlessly.",
 		},
 		{
 			icon: "/assets/3.png",
 			title: "Knowledge",
-			description: "One hub for your team's intelligence."
+			description: "One hub for your team's intelligence.",
 		},
 		{
 			icon: "/assets/4.png",
 			title: "Precision",
-			description: "Centralize knowledge, streamline collaboration."
+			description: "Centralize knowledge, streamline collaboration.",
 		},
 		{
 			icon: "/assets/5.png",
 			title: "Success",
-			description: "Deliver every project with precision."
+			description: "Deliver every project with precision.",
 		},
 		{
 			icon: "/assets/6.png",
 			title: "Goals",
-			description: "Plan, execute, and track progress from start to finish."
+			description: "Plan, execute, and track progress from start to finish.",
 		},
 		{
 			icon: "/assets/7.png",
 			title: "Neothink AI",
-			description: "Answers at your fingertips."
+			description: "Answers at your fingertips.",
 		},
 		{
 			icon: "/assets/8.png",
 			title: "Schedule",
-			description: "Your schedule, all in one view."
-		}
+			description: "Your schedule, all in one view.",
+		},
 	];
 </script>
 
 <div class="container">
+	<!-- Header -->
 	<header class="header">
 		<div class="header-logo">
-			<a href='home'><img src="/assets/neothink.png" alt="Logo" /></a>
+			<img src="/assets/neothink.png" alt="Logo" />
 		</div>
 		<nav class="header-nav">
 			<a href="#">Product</a>
@@ -76,6 +77,7 @@
 		</nav>
 	</header>
 
+	<!-- Hero Section -->
 	<main class="main-container">
 		<h1>Smarter Workflows, Smarter Teams</h1>
 		<p>Plan. Optimize. Achieve. Powered by the brilliance of AI.</p>
@@ -89,6 +91,7 @@
 		</div>
 	</main>
 
+	<!-- Key Features Section -->
 	<section class="key-features">
 		<h2>Explore Neothink's Core Features</h2>
 		<div class="feature-cards">
@@ -98,7 +101,10 @@
 				</div>
 				<div class="card-body">
 					<h3>Neotaskmaster</h3>
-					<p>Smart AI Task Management with assignment and scheduling capabilities.</p>
+					<p>
+						Smart AI Task Management with assignment and scheduling
+						capabilities.
+					</p>
 				</div>
 			</div>
 			<div class="key-feature-card">
@@ -107,7 +113,10 @@
 				</div>
 				<div class="card-body">
 					<h3>Neometrics</h3>
-					<p>Advanced AI Data Analytics for tracking productivity and performance.</p>
+					<p>
+						Advanced AI Data Analytics for tracking productivity and
+						performance.
+					</p>
 				</div>
 			</div>
 			<div class="key-feature-card">
@@ -116,12 +125,15 @@
 				</div>
 				<div class="card-body">
 					<h3>Neoplan</h3>
-					<p>Intelligent Project Management System for roadmap and task handling.</p>
+					<p>
+						Intelligent Project Management System for roadmap and task handling.
+					</p>
 				</div>
 			</div>
 		</div>
 	</section>
 
+	<!-- Features Section -->
 	<section class="features">
 		<h2>Core Features</h2>
 		<div class="feature-cards">
@@ -135,6 +147,7 @@
 		</div>
 	</section>
 
+	<!-- Footer -->
 	<footer class="footer">
 		<div class="footer-logo">
 			<img src="/assets/neothink.png" alt="Footer Logo" />
@@ -149,9 +162,11 @@
 </div>
 
 <style>
+	/* General Styling */
 	:global(body) {
 		margin: 0;
 		font-family: Arial, sans-serif;
+		background-color: #ffffff;
 	}
 
 	.container {
@@ -164,6 +179,7 @@
 		align-items: center;
 	}
 
+	/* Header Styling */
 	.header {
 		display: flex;
 		justify-content: space-between;
@@ -184,6 +200,7 @@
 		font-weight: 600;
 	}
 
+	/* Hero Section */
 	.main-container {
 		text-align: center;
 		margin-bottom: 40px;
@@ -239,6 +256,7 @@
 		box-shadow: 0 4px 8px rgba(0, 82, 204, 0.1);
 	}
 
+	/* Key Features Section */
 	.key-features {
 		margin-top: 60px;
 		width: 100%;
@@ -258,39 +276,42 @@
 	}
 
 	.key-feature-card {
-		background: #f9f9f9;
-		border-radius: 16px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		overflow: hidden;
-		transition: transform 0.3s, box-shadow 0.3s;
-	}
+  background: #f8f8f8;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 250px; /* Make it more compact like features */
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  overflow: hidden; /* Ensures no parts overflow */
+}
 
-	.key-feature-card:hover {
-		transform: translateY(-10px);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-	}
+.key-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
 
-	.card-header img {
-		width: 100%;
-		height: 200px;
-		object-fit: cover;
-	}
+.card-header img {
+  width: 100%;
+  height: auto; /* Ensure the entire image is visible */
+  object-fit: contain; /* Maintain image aspect ratio */
+}
 
-	.card-body {
-		padding: 20px;
-	}
+.card-body {
+  padding: 20px; /* Uniform padding */
+}
 
-	.card-body h3 {
-		font-size: 24px;
-		margin-bottom: 10px;
-		color: #333;
-	}
+.card-body h3 {
+  font-size: 18px; /* Consistent with features */
+  margin-bottom: 10px;
+}
 
-	.card-body p {
-		font-size: 16px;
-		color: #555;
-	}
+.card-body p {
+  font-size: 14px;
+  color: #555;
+}
 
+
+	/* Features Section */
 	.features {
 		width: 100%;
 		text-align: center;
@@ -302,6 +323,13 @@
 		margin-bottom: 30px;
 	}
 
+	.feature-cards {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 20px;
+	}
+
 	.feature-card {
 		background: #f8f8f8;
 		border-radius: 12px;
@@ -309,7 +337,9 @@
 		width: 200px;
 		text-align: center;
 		padding: 20px;
-		transition: transform 0.3s, box-shadow 0.3s;
+		transition:
+			transform 0.3s,
+			box-shadow 0.3s;
 	}
 
 	.feature-card:hover {
@@ -334,9 +364,16 @@
 		color: #555;
 	}
 
+	/* Footer */
 	.footer {
 		margin-top: 40px;
 		text-align: center;
+	}
+
+	.footer-logo {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 10px;
 	}
 
 	.footer-logo img {
