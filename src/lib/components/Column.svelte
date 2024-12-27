@@ -1,6 +1,7 @@
 <script>
   import Task from '$lib/components/Task.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   export let column;
   /** @type {Array<{ id: string, columnId: string, title: string }>} */
@@ -11,6 +12,8 @@
   let isAddingTask = false;
   let dragOverIndex = -1;
   let dropTarget = null;
+  let isAddingTaskAtBottom = false;
+  let bottomInputRef;
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
@@ -75,6 +78,18 @@
     dispatch('deleteTask', { taskId });
   }
 
+  function handleAddTaskFromBottom() {
+    if (newTaskTitle.trim()) {
+      dispatch('addTask', { title: newTaskTitle, columnId: column.id });
+      newTaskTitle = '';
+      isAddingTaskAtBottom = false;
+    }
+  }
+
+  $: if (isAddingTaskAtBottom) {
+    setTimeout(() => bottomInputRef?.focus(), 0);
+  }
+
   $: taskCount = tasks.filter(task => task.columnId === column.id).length;
 </script>
 
@@ -132,6 +147,39 @@
       <div class="drop-indicator" />
     {/if}
   </ul>
+  
+  <div class="create-task-bottom">
+    {#if isAddingTaskAtBottom}
+      <div class="bottom-input-container" transition:slide|local>
+        <input
+          bind:this={bottomInputRef}
+          bind:value={newTaskTitle}
+          placeholder="Enter task title..."
+          on:keyup="{e => e.key === 'Enter' && handleAddTaskFromBottom()}"
+          on:blur={() => {
+            if (!newTaskTitle.trim()) isAddingTaskAtBottom = false;
+          }}
+        />
+        <div class="bottom-input-actions">
+          <button class="add-button" on:click={handleAddTaskFromBottom}>Add</button>
+          <button 
+            class="cancel-button"
+            on:click={() => {
+              isAddingTaskAtBottom = false;
+              newTaskTitle = '';
+            }}
+          >Cancel</button>
+        </div>
+      </div>
+    {:else}
+      <button 
+        class="create-button" 
+        on:click={() => isAddingTaskAtBottom = true}
+      >
+        <span class="plus">+</span> Create
+      </button>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -143,6 +191,9 @@
     max-height: 100%;
     overflow-y: auto;
     transition: background-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
   }
   h2 {
     font-size: 14px;
@@ -242,6 +293,9 @@
     padding: 1px 0;
     margin: 0;
     min-height: 40px;
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 0;
   }
   .header-title {
     display: flex;
@@ -286,5 +340,71 @@
     to {
       opacity: 1;
     }
+  }
+
+  .create-task-bottom {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .create-button {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: #42526E;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.8;
+  }
+
+  .create-button:hover {
+    background: rgba(9, 30, 66, 0.04);
+    color: #172B4D;
+    opacity: 1;
+  }
+
+  .plus {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .bottom-input-container {
+    width: 100%;
+    background: white;
+    border-radius: 3px;
+    padding: 8px;
+    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25);
+    margin-top: 4px;
+  }
+
+  .bottom-input-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .bottom-input-actions button {
+    flex: 1;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .add-button {
+    background: #36B37E;
+    color: white;
+  }
+
+  .add-button:hover {
+    background: #2ea06e;
   }
 </style>
