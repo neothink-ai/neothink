@@ -1,7 +1,8 @@
 <script>
   import Task from '$lib/components/Task.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   import { slide } from 'svelte/transition';
+  
 
   export let column;
   /** @type {Array<{ id: string, columnId: string, title: string }>} */
@@ -14,6 +15,7 @@
   let dropTarget = null;
   let isAddingTaskAtBottom = false;
   let bottomInputRef;
+  let inputTimeout;
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
@@ -75,7 +77,10 @@
   }
 
   function handleDeleteTask(taskId) {
-    dispatch('deleteTask', { taskId });
+    const taskToDelete = tasks.find(t => t.columnId === column.id && t.id === taskId);
+    if (taskToDelete) {
+      dispatch('deleteTask', { taskId });
+    }
   }
 
   function handleAddTaskFromBottom() {
@@ -86,11 +91,33 @@
     }
   }
 
+  function startInputTimeout() {
+    clearTimeout(inputTimeout);
+    inputTimeout = setTimeout(() => {
+      if (!newTaskTitle.trim()) {
+        isAddingTask = false;
+      }
+    }, 5000); // 5 seconds timeout
+  }
+
+  function clearInputTimeout() {
+    clearTimeout(inputTimeout);
+  }
+
+  $: if (isAddingTask) {
+    startInputTimeout();
+  }
+
   $: if (isAddingTaskAtBottom) {
     setTimeout(() => bottomInputRef?.focus(), 0);
   }
 
   $: taskCount = tasks.filter(task => task.columnId === column.id).length;
+  $: columnTasks = tasks.filter(task => task.columnId === column.id);
+
+  onDestroy(() => {
+    clearInputTimeout();
+  });
 </script>
 
 <div
@@ -114,11 +141,22 @@
   </div>
   <ul>
     {#if isAddingTask}
-      <li class="new-task-input">
+      <li 
+        class="new-task-input"
+        on:mouseenter={clearInputTimeout}
+        on:mouseleave={startInputTimeout}
+      >
         <input
           placeholder="What needs to be done?"
           bind:value={newTaskTitle}
-          on:keyup="{e => e.key === 'Enter' && handleAddTask()}"
+          on:keyup="{e => {
+            if (e.key === 'Enter') {
+              handleAddTask();
+            }
+            startInputTimeout();
+          }}"
+          on:focus={clearInputTimeout}
+          on:blur={startInputTimeout}
           autofocus
         />
         <div class="new-task-actions">
@@ -133,8 +171,8 @@
         </div>
       </li>
     {/if}
-    {#each tasks.filter(task => task.columnId === column.id) as task, index}
-      {#if dragOverIndex === index}
+    {#each columnTasks as task (task.id)}
+      {#if dragOverIndex === columnTasks.indexOf(task)}
         <div class="drop-indicator" />
       {/if}
       <Task
@@ -143,7 +181,7 @@
         onDeleteTask={handleDeleteTask}
       />
     {/each}
-    {#if dragOverIndex === tasks.filter(task => task.columnId === column.id).length}
+    {#if dragOverIndex === columnTasks.length}
       <div class="drop-indicator" />
     {/if}
   </ul>

@@ -28,6 +28,11 @@
     editedTitle = task.title;
     isEditing = false;
   }
+
+  function handleDelete(event) {
+    event.stopPropagation(); // Prevent event bubbling
+    onDeleteTask(task.id);
+  }
 </script>
 
 <li
@@ -35,13 +40,23 @@
   draggable="true"
   on:dragstart={handleDragStart}
   on:dragend={handleDragEnd}
+  data-task-id={task.id}
 >
   {#if isEditing}
-    <input bind:value={editedTitle} on:blur={saveEdit} on:keyup="{e => e.key === 'Enter' && saveEdit()}" />
-    <button on:click={cancelEdit}>Cancel</button>
+    <input 
+      bind:value={editedTitle} 
+      on:blur={saveEdit} 
+      on:keyup="{e => e.key === 'Enter' && saveEdit()}"
+    />
+    <button on:click|stopPropagation={cancelEdit}>Cancel</button>
   {:else}
-    <span on:dblclick={() => isEditing = true}>{task.title}</span>
-    <button on:click={() => onDeleteTask(task.id)}>Delete</button>
+    <span on:dblclick|stopPropagation={() => isEditing = true}>{task.title}</span>
+    <button 
+      class="delete-button"
+      on:click|stopPropagation={handleDelete}
+    >
+      Delete
+    </button>
   {/if}
 </li>
 
