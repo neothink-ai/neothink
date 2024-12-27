@@ -1,11 +1,13 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'http://127.0.0.1:8000';
 
 export async function getUserProfile(userId) {
   try {
+    console.log("Sending fetch-user request: ")
     const response = await axios.get(`${BASE_URL}/fetch-user/${userId}`);
-    return response.data;
+    let return_data = JSON.parse(response.data);
+    return return_data;
   } catch (error) {
     throw new Error('Error fetching user profile: ' + error.message);
   }
@@ -13,8 +15,11 @@ export async function getUserProfile(userId) {
 
 export async function updateUserProfile(userId, updates) {
   try {
+    console.log(typeof(updates));
+    console.log(updates);
     const response = await axios.post(`${BASE_URL}/update-profile/${userId}`, updates);
-    return response.data;
+    let return_data = JSON.parse(response.data);
+    return return_data;
   } catch (error) {
     throw new Error('Error updating user profile: ' + error.message);
   }
@@ -22,8 +27,10 @@ export async function updateUserProfile(userId, updates) {
 
 export async function getUserTeamsDetails(userId) {
   try {
+    console.log("Getting fetch-teams request: ")
     const response = await axios.get(`${BASE_URL}/fetch-teams/${userId}`);
-    return response.data;
+    let return_data = JSON.parse(response.data);
+    return return_data;
   } catch (error) {
     throw new Error('Error fetching user teams: ' + error.message);
   }

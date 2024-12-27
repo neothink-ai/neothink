@@ -2,12 +2,12 @@
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/userStore';
   import { getUserProfile, updateUserProfile, getUserTeamsDetails } from '$lib/firebase/users';
-
+  
   let profile = null;
   let teams = [];
+  let teams_str = ''; 
   let loading = true;
   let editing = false;
-  let formData = {};
   let error = '';
 
   onMount(async () => {
@@ -15,16 +15,15 @@
       try {
         const userData = await getUserProfile($user.uid);
         profile = userData;
-        formData = {
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          department: userData.department,
-          skills: [...userData.skills]
-        };
+        console.log(typeof(profile))
+        console.log(profile)
         
         if (userData.teams?.length) {
-          teams = await Promise.all(userData.teams.map(teamId => getUserTeamsDetails(teamId)));
+          teams = await getUserTeamsDetails($user.uid);
         }
+        console.log(profile.teams);
+        console.log("teams: ");
+        console.log(teams);
       } catch (err) {
         error = err.message;
       } finally {
@@ -35,26 +34,17 @@
 
   async function handleSubmit() {
     try {
-      await updateUserProfile($user.uid, formData);
-      profile = { ...profile, ...formData };
+      await updateUserProfile($user.uid, profile);
       editing = false;
       error = '';
     } catch (err) {
       error = err.message;
     }
   }
-
-  function addSkill() {
-    formData.skills = [...formData.skills, ''];
-  }
-
-  function removeSkill(index) {
-    formData.skills = formData.skills.filter((_, i) => i !== index);
-  }
 </script>
 
 <div class="flex min-h-screen bg-gray-100">
-  <main class="flex-1 p-8"></main>
+  <main class="flex-1 p-8">
     {#if loading}
       <div class="flex justify-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -78,39 +68,43 @@
         {#if editing}
           <form on:submit|preventDefault={handleSubmit} class="space-y-4">
             <div>
+              <label class="block text-sm font-medium text-gray-700">First Name</label>
+              <input
+                type="text"
+                bind:value={profile.first_name}
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Last Name</label>
+              <input
+                type="text"
+                bind:value={profile.last_name}
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-700">Department</label>
               <input
                 type="text"
-                bind:value={formData.department}
+                bind:value={profile.department}
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700">Skills</label>
-              {#each formData.skills as skill, i}
+              {#each profile.skills as skill, i}
                 <div class="flex space-x-2 mt-2">
                   <input
                     type="text"
-                    bind:value={formData.skills[i]}
+                    bind:value={profile.skills[i]}
                     class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
-                  <button
-                    type="button"
-                    on:click={() => removeSkill(i)}
-                    class="text-red-600 hover:text-red-800"
-                  >
-                    Remove
-                  </button>
                 </div>
               {/each}
-              <button
-                type="button"
-                on:click={addSkill}
-                class="mt-2 text-blue-600 hover:text-blue-800"
-              >
-                Add Skill
-              </button>
             </div>
 
             <button
@@ -124,12 +118,12 @@
           <div class="space-y-4">
             <div>
               <h2 class="text-sm font-medium text-gray-500">First Name</h2>
-              <p class="mt-1">{profile.firstName}</p>
+              <p class="mt-1">{profile.first_name}</p>
             </div>
 
             <div>
               <h2 class="text-sm font-medium text-gray-500">Last Name</h2>
-              <p class="mt-1">{profile.lastName}</p>
+              <p class="mt-1">{profile.last_name}</p>
             </div>
 
             <div>
@@ -152,9 +146,16 @@
               <h2 class="text-sm font-medium text-gray-500">Teams</h2>
               <div class="mt-2 space-y-2">
                 {#each teams as team}
-                  <div class="p-3 bg-gray-50 rounded-lg"></div>
-                    <h3 class="font-medium">{team.name}</h3>
-                    <p class="text-sm text-gray-600">Created: {new Date(team.createdAt).toLocaleDateString()}</p>
+                  <div class="p-3 bg-gray-50 rounded-lg">
+                    <h3 class="font-medium">{team.team_name}</h3>
+                    <p class="text-sm text-gray-600">
+                      Users: 
+                      {#each team.users as userId, i}
+                        {#await getUserProfile(userId) then userProfile}
+                          {userProfile.first_name} {userProfile.last_name}{i < team.users.length - 1 ? ', ' : ''}
+                        {/await}
+                      {/each}
+                    </p>
                   </div>
                 {/each}
               </div>
