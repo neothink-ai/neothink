@@ -87,14 +87,15 @@
 <style>
   .kanban-board {
     display: flex;
-    gap: 24px;
+    gap: 12px;
     padding: 24px;
     overflow-x: auto;
-    height: 100vh;
-    background-color: #edf2f7;
-    transition: background-color 0.3s ease;
+    height: calc(100vh - 48px);
+    background-color: #f4f5f7;
+    transition: background-color 0.2s ease;
+    align-items: flex-start;
   }
   .kanban-board.dragging {
-    background-color: #e2e8f0;
+    background-color: #ebecf0;
   }
 </style>

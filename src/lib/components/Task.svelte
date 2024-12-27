@@ -40,27 +40,54 @@
 <style>
   .task {
     background-color: #fff;
-    padding: 8px;
+    padding: 12px;
     margin-bottom: 8px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25);
     cursor: grab;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border: 2px solid transparent;
+  }
+  .task:hover {
+    background-color: #f4f5f7;
   }
   .task:active {
     cursor: grabbing;
+    transform: rotate(2deg);
   }
   input {
     flex: 1;
     margin-right: 8px;
-    padding: 4px;
+    padding: 6px 8px;
+    border: 2px solid #4c9aff;
+    border-radius: 3px;
+    font-size: 14px;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
+  }
+  input:focus {
+    outline: none;
   }
   button {
+    padding: 4px 8px;
     background: none;
     border: none;
-    color: #ff4d4f;
+    color: #42526e;
     cursor: pointer;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  button:hover {
+    background: #ebecf0;
+    color: #172b4d;
+  }
+  span {
+    font-size: 14px;
+    color: #172b4d;
+    flex: 1;
+    padding: 2px 4px;
   }
 </style>
