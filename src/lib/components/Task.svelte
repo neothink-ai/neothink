@@ -73,16 +73,17 @@
   }
   button {
     padding: 4px 8px;
-    background: none;
+    background: transparent;
     border: none;
     color: #42526e;
     cursor: pointer;
     border-radius: 3px;
     font-size: 12px;
+    transition: all 0.15s ease;
   }
   button:hover {
-    background: #ebecf0;
-    color: #172b4d;
+    color: #FF5630;
+    background: rgba(255, 86, 48, 0.08);
   }
   span {
     font-size: 14px;

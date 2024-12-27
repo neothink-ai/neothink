@@ -34,6 +34,8 @@
   function handleDeleteTask(taskId) {
     dispatch('deleteTask', { taskId });
   }
+
+  $: taskCount = tasks.filter(task => task.columnId === column.id).length;
 </script>
 
 <div
@@ -43,7 +45,10 @@
   role="list"
 >
   <div class="column-header">
-    <h2>{column.title}</h2>
+    <div class="header-title">
+      <h2>{column.title}</h2>
+      <span class="task-count">{taskCount}</span>
+    </div>
     <div class="add-task-trigger">
       <span 
         class="plus-icon" 
@@ -95,14 +100,14 @@
     font-size: 14px;
     font-weight: 600;
     color: #172b4d;
-    margin-bottom: 12px;
+    margin-bottom: 0;
     padding: 0 4px;
   }
   .column-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
   .add-task-trigger {
     position: relative;
@@ -189,5 +194,21 @@
     padding: 0;
     margin: 0;
     min-height: 40px;
+  }
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .task-count {
+    font-size: 12px;
+    color: #5E6C84;
+    background: rgba(9, 30, 66, 0.04);
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+    transition: all 0.2s ease;
   }
 </style>
