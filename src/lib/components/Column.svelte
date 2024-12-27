@@ -10,6 +10,7 @@
   let newTaskTitle = '';
   let isAddingTask = false;
   let dragOverIndex = -1;
+  let dropTarget = null;
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
@@ -24,27 +25,29 @@
     const taskElements = Array.from(event.currentTarget.querySelectorAll('.task'));
     const mouseY = event.clientY;
     
+    // Throttle the drag over calculations
+    if (dropTarget && dropTarget === event.target) {
+      return;
+    }
+    dropTarget = event.target;
+    
     let newDragOverIndex = -1;
     
-    // Find the insertion point
     for (let i = 0; i < taskElements.length; i++) {
       const rect = taskElements[i].getBoundingClientRect();
-      const middleY = rect.top + rect.height / 2;
+      const threshold = rect.top + (rect.height * 0.5);
       
-      if (mouseY < middleY) {
+      if (mouseY < threshold) {
         newDragOverIndex = i;
         break;
       }
     }
     
-    // If we're below all tasks, set index to the end
     if (newDragOverIndex === -1) {
       newDragOverIndex = columnTasks.length;
     }
     
-    if (dragOverIndex !== newDragOverIndex) {
-      dragOverIndex = newDragOverIndex;
-    }
+    dragOverIndex = newDragOverIndex;
   }
 
   function handleDrop(event) {
@@ -139,6 +142,7 @@
     padding: 12px;
     max-height: 100%;
     overflow-y: auto;
+    transition: background-color 0.2s ease;
   }
   h2 {
     font-size: 14px;
@@ -235,7 +239,7 @@
   }
   ul {
     list-style-type: none;
-    padding: 0;
+    padding: 1px 0;
     margin: 0;
     min-height: 40px;
   }
@@ -259,9 +263,20 @@
   .drop-indicator {
     height: 2px;
     background: #4c9aff;
-    margin: 4px 0;
+    margin: 0;
     border-radius: 1px;
-    animation: fadeIn 0.2s ease-out;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    animation: scaleIn 0.15s ease-out;
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
   }
 
   @keyframes fadeIn {

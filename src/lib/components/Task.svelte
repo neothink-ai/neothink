@@ -5,9 +5,16 @@
 
   let isEditing = false;
   let editedTitle = task.title;
+  let isDragging = false;
 
   function handleDragStart(event) {
+    isDragging = true;
     event.dataTransfer.setData('taskId', task.id);
+    event.dataTransfer.effectAllowed = 'move';
+  }
+
+  function handleDragEnd() {
+    isDragging = false;
   }
 
   function saveEdit() {
@@ -24,9 +31,10 @@
 </script>
 
 <li
-  class="task"
+  class="task {isDragging ? 'is-dragging' : ''}"
   draggable="true"
   on:dragstart={handleDragStart}
+  on:dragend={handleDragEnd}
 >
   {#if isEditing}
     <input bind:value={editedTitle} on:blur={saveEdit} on:keyup="{e => e.key === 'Enter' && saveEdit()}" />
@@ -48,17 +56,29 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: 
+      background-color 0.2s ease,
+      transform 0.1s ease,
+      box-shadow 0.1s ease;
     border: 2px solid transparent;
     user-select: none;
+    transform-origin: center;
   }
   .task:hover {
     background-color: #f4f5f7;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.15);
+  }
+  .task.is-dragging {
+    opacity: 0.9;
+    transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(9, 30, 66, 0.25);
+    background: #fff;
+    cursor: grabbing;
   }
   .task:active {
     cursor: grabbing;
-    transform: rotate(1deg) scale(1.02);
-    box-shadow: 0 3px 8px rgba(9, 30, 66, 0.15);
+    transform: scale(1.02);
   }
   input {
     flex: 1;
