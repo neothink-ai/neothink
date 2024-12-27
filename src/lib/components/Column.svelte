@@ -44,27 +44,34 @@
 >
   <div class="column-header">
     <h2>{column.title}</h2>
-    <div class="add-task-trigger" on:mouseenter={() => isAddingTask = true}>
-      <span class="plus-icon">+</span>
-      {#if isAddingTask}
-        <div 
-          class="floating-input"
-          on:mouseleave={() => {
-            isAddingTask = false;
-            newTaskTitle = '';
-          }}
-        >
-          <input
-            placeholder="New task"
-            bind:value={newTaskTitle}
-            on:keyup="{e => e.key === 'Enter' && handleAddTask()}"
-          />
-          <button on:click={handleAddTask}>Add</button>
-        </div>
-      {/if}
+    <div class="add-task-trigger">
+      <span 
+        class="plus-icon" 
+        on:click={() => isAddingTask = !isAddingTask}
+      >+</span>
     </div>
   </div>
   <ul>
+    {#if isAddingTask}
+      <li class="new-task-input">
+        <input
+          placeholder="What needs to be done?"
+          bind:value={newTaskTitle}
+          on:keyup="{e => e.key === 'Enter' && handleAddTask()}"
+          autofocus
+        />
+        <div class="new-task-actions">
+          <button on:click={handleAddTask}>Add</button>
+          <button 
+            class="cancel-button" 
+            on:click={() => {
+              isAddingTask = false;
+              newTaskTitle = '';
+            }}
+          >Cancel</button>
+        </div>
+      </li>
+    {/if}
     {#each tasks.filter(task => task.columnId === column.id) as task}
       <Task
         {task}
@@ -102,62 +109,61 @@
     cursor: pointer;
   }
   .plus-icon {
-    font-size: 20px;
+    font-size: 18px;
     color: #42526e;
     padding: 4px 8px;
     border-radius: 3px;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+    cursor: pointer;
   }
   .plus-icon:hover {
     background-color: rgba(9, 30, 66, 0.08);
+    opacity: 1;
   }
-  .floating-input {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
+  .new-task-input {
+    background-color: #fff;
     padding: 8px;
+    margin-bottom: 8px;
     border-radius: 3px;
-    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.25);
+    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25);
+    animation: slideIn 0.2s ease-out;
+    border: 2px solid #4c9aff;
+  }
+  .new-task-actions {
     display: flex;
     gap: 8px;
-    z-index: 1000;
-    min-width: 200px;
+    margin-top: 8px;
   }
-  .task-input {
-    display: none;
+  .cancel-button {
+    background: #ebecf0;
+    color: #42526e;
   }
-  .task-input {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+  .cancel-button:hover {
+    background: #dfe1e6;
+  }
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   input {
-    flex: 1;
-    padding: 8px;
-    border: 2px solid transparent;
-    border-radius: 3px;
-    background-color: #fff;
-    box-shadow: 0 0 0 1px rgba(9, 30, 66, 0.13);
-    transition: background-color 0.2s ease;
+    width: 100%;
+    padding: 4px 0;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: #172b4d;
   }
   input:focus {
-    border-color: #4c9aff;
-    box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
-    outline: none;
-  }
-  button {
-    padding: 8px 12px;
-    background: #0052cc;
-    color: white;
     border: none;
-    border-radius: 3px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  button:hover {
-    background: #0065ff;
+    box-shadow: none;
+    outline: none;
   }
   ul {
     list-style-type: none;
