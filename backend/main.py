@@ -1,13 +1,20 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Any, Dict
+from typing import Any, Dict, Optional, List
 import requests
 import json
 from pymongo import MongoClient
 from bson.json_util import dumps
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # MongoDB setup
 client = MongoClient("mongodb+srv://neothink_deploy:neothinkisthebest@neothink.xnzwv.mongodb.net/?retryWrites=true&w=majority&appName=neothink")
 
@@ -16,6 +23,15 @@ client = MongoClient("mongodb+srv://neothink_deploy:neothinkisthebest@neothink.x
 class Item(BaseModel):
     key: str
     value: Any
+
+class UserProfileUpdate(BaseModel):
+    _id: Item
+    user_id: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    department: Optional[str]
+    skills: Optional[List[str]]
+    teams: Optional[List[str]]
 
 @app.post("/process-json")
 async def process_json(item: Item):
@@ -49,6 +65,7 @@ async def fetch_mongodb():
 
 @app.get("/fetch-user/{user_id}")
 async def fetch_user(user_id: str):
+    print(f"Received fetch-user request: {user_id}")
     try:
         users_db = client["Users"]
         user_data_collection = users_db["user_data"]
@@ -63,6 +80,7 @@ async def fetch_user(user_id: str):
     
 @app.get("/fetch-teams/{user_id}")
 async def fetch_teams(user_id: str):
+    print(f"Received fetch-teams request: {user_id}")
     try:
         teams_db = client["Teams"]
         teams_collection = teams_db["teams"]
@@ -114,7 +132,30 @@ async def fetch_all_teams():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
+@app.post("/update-profile/{user_id}")
+async def update_profile(user_id: str, profile: UserProfileUpdate):
+    try:
+        users_db = client["Users"]
+        user_data_collection = users_db["user_data"]
+        update_data = {
+            "user_id": user_id,
+            "first_name": profile.value.get("first_name"),
+            "last_name": profile.value.get("last_name"),
+            "department": profile.value.get("department"),
+            "skills": profile.value.get("skills", []),
+            "teams": profile.value.get("teams", [])
+        }
+        result = user_data_collection.update_one(
+            {"user_id": user_id},
+            {"$set": update_data},
+            upsert=True
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=6876)
+    uvicorn.run(app, host="127.0.0.1", port=6876)
