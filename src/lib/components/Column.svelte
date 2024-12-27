@@ -11,7 +11,7 @@
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
-      dispatch('addTask', { title: newTaskTitle });
+      dispatch('addTask', { title: newTaskTitle, columnId: column.id });
       newTaskTitle = '';
     }
   }
@@ -23,28 +23,40 @@
   function handleDrop(event) {
     event.preventDefault();
     const taskId = event.dataTransfer.getData('taskId');
-    dispatch('moveTask', { taskId });
+    dispatch('moveTask', { taskId, newColumnId: column.id });
+  }
+
+  function handleEditTask(taskId, newTitle) {
+    dispatch('editTask', { taskId, newTitle });
+  }
+
+  function handleDeleteTask(taskId) {
+    dispatch('deleteTask', { taskId });
   }
 </script>
 
 <div
   class="column"
   on:drop={handleDrop}
+  on:dragover={handleDragOver}
   role="list"
->
 >
   <h2>{column.title}</h2>
   <div class="task-input">
     <input
       placeholder="New task"
       bind:value={newTaskTitle}
-      on:keyup={(e) => e.key === 'Enter' && handleAddTask()}
+      on:keyup="{e => e.key === 'Enter' && handleAddTask()}"
     />
     <button on:click={handleAddTask}>Add</button>
   </div>
   <ul>
     {#each tasks.filter(task => task.columnId === column.id) as task}
-      <Task {task} />
+      <Task
+        {task}
+        onEditTask={handleEditTask}
+        onDeleteTask={handleDeleteTask}
+      />
     {/each}
   </ul>
 </div>
