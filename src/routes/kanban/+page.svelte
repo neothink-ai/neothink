@@ -46,4 +46,38 @@
   });
 </script>
 
-<KanbanBoard {columns} {tasks} on:addTask={addTask} on:moveTask={moveTask} />
+<div class="kanban-container">
+  <div class="logo-container">
+    <img 
+      src="src\lib\assets\neotaskmaster-logo.png" 
+      alt="NeoTaskMaster"
+      class="logo"
+    />
+  </div>
+  <KanbanBoard {columns} {tasks} on:addTask={addTask} on:moveTask={moveTask} />
+</div>
+
+<style>
+  .kanban-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-container {
+    padding: 16px 24px;
+    background: #f4f5f7;
+    box-shadow: 0 1px 0 rgba(9, 30, 66, 0.08);
+  }
+
+  .logo {
+    height: 32px;
+    width: auto;
+    opacity: 0.95;
+    transition: opacity 0.2s ease;
+  }
+
+  .logo:hover {
+    opacity: 1;
+  }
+</style>
