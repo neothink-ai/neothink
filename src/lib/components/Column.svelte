@@ -9,6 +9,7 @@
   const dispatch = createEventDispatcher();
   let newTaskTitle = '';
   let isAddingTask = false;
+  let dragOverIndex = -1;
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
@@ -19,12 +20,48 @@
 
   function handleDragOver(event) {
     event.preventDefault();
+    const columnTasks = tasks.filter(task => task.columnId === column.id);
+    const taskElements = Array.from(event.currentTarget.querySelectorAll('.task'));
+    const mouseY = event.clientY;
+    
+    let newDragOverIndex = -1;
+    
+    // Find the insertion point
+    for (let i = 0; i < taskElements.length; i++) {
+      const rect = taskElements[i].getBoundingClientRect();
+      const middleY = rect.top + rect.height / 2;
+      
+      if (mouseY < middleY) {
+        newDragOverIndex = i;
+        break;
+      }
+    }
+    
+    // If we're below all tasks, set index to the end
+    if (newDragOverIndex === -1) {
+      newDragOverIndex = columnTasks.length;
+    }
+    
+    if (dragOverIndex !== newDragOverIndex) {
+      dragOverIndex = newDragOverIndex;
+    }
   }
 
   function handleDrop(event) {
     event.preventDefault();
     const taskId = event.dataTransfer.getData('taskId');
-    dispatch('moveTask', { taskId, newColumnId: column.id });
+    const currentTask = tasks.find(t => t.id === taskId);
+    
+    // Only dispatch if we're actually moving the task
+    if (currentTask && (currentTask.columnId !== column.id || dragOverIndex !== -1)) {
+      dispatch('moveTask', { 
+        taskId, 
+        newColumnId: column.id,
+        targetIndex: dragOverIndex
+      });
+    }
+    
+    dragOverIndex = -1;
   }
 
   function handleEditTask(taskId, newTitle) {
@@ -42,6 +79,7 @@
   class="column"
   on:drop={handleDrop}
   on:dragover={handleDragOver}
+  on:dragleave={() => dragOverIndex = -1}
   role="list"
 >
   <div class="column-header">
@@ -77,13 +115,19 @@
         </div>
       </li>
     {/if}
-    {#each tasks.filter(task => task.columnId === column.id) as task}
+    {#each tasks.filter(task => task.columnId === column.id) as task, index}
+      {#if dragOverIndex === index}
+        <div class="drop-indicator" />
+      {/if}
       <Task
         {task}
         onEditTask={handleEditTask}
         onDeleteTask={handleDeleteTask}
       />
     {/each}
+    {#if dragOverIndex === tasks.filter(task => task.columnId === column.id).length}
+      <div class="drop-indicator" />
+    {/if}
   </ul>
 </div>
 
@@ -210,5 +254,22 @@
     min-width: 20px;
     text-align: center;
     transition: all 0.2s ease;
+  }
+
+  .drop-indicator {
+    height: 2px;
+    background: #4c9aff;
+    margin: 4px 0;
+    border-radius: 1px;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>

@@ -50,13 +50,15 @@
     align-items: center;
     transition: background-color 0.2s ease, transform 0.2s ease;
     border: 2px solid transparent;
+    user-select: none;
   }
   .task:hover {
     background-color: #f4f5f7;
   }
   .task:active {
     cursor: grabbing;
-    transform: rotate(2deg);
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 0 3px 8px rgba(9, 30, 66, 0.15);
   }
   input {
     flex: 1;

@@ -32,10 +32,34 @@
     saveTasks();
   }
 
-  function moveTask(taskId, newColumnId) {
-    tasks = tasks.map(task =>
-      task.id === taskId ? { ...task, columnId: newColumnId } : task
-    );
+  function moveTask(taskId, newColumnId, targetIndex) {
+    const taskToMove = tasks.find(t => t.id === taskId);
+    if (!taskToMove) return;
+
+    const updatedTasks = tasks.filter(t => t.id !== taskId);
+    const targetColumnTasks = updatedTasks.filter(t => t.columnId === newColumnId);
+    
+    // Calculate the actual index in the full tasks array
+    let insertAtIndex;
+    if (targetIndex === 0) {
+      // Insert at the beginning of the column
+      insertAtIndex = updatedTasks.findIndex(t => t.columnId === newColumnId);
+      if (insertAtIndex === -1) insertAtIndex = updatedTasks.length;
+    } else if (targetIndex >= targetColumnTasks.length) {
+      // Insert at the end of the column
+      const lastColumnTask = [...targetColumnTasks].pop();
+      insertAtIndex = lastColumnTask 
+        ? updatedTasks.indexOf(lastColumnTask) + 1 
+        : updatedTasks.length;
+    } else {
+      // Insert at specific position
+      const targetTask = targetColumnTasks[targetIndex];
+      insertAtIndex = updatedTasks.indexOf(targetTask);
+    }
+
+    // Insert the task at the calculated position
+    updatedTasks.splice(insertAtIndex, 0, { ...taskToMove, columnId: newColumnId });
+    tasks = updatedTasks;
     saveTasks();
   }
 
@@ -77,7 +101,11 @@
       {column}
       {tasks}
       on:addTask={(event) => addTask(event.detail.title, column.id)}
-      on:moveTask={(event) => moveTask(event.detail.taskId, column.id)}
+      on:moveTask={(event) => moveTask(
+        event.detail.taskId, 
+        column.id, 
+        event.detail.targetIndex
+      )}
       on:editTask={(event) => editTask(event.detail.taskId, event.detail.newTitle)}
       on:deleteTask={(event) => deleteTask(event.detail.taskId)}
     />
