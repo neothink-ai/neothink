@@ -137,30 +137,29 @@
   }
   .new-task-actions button {
     flex: 1;
-    padding: 6px 12px;
-    border: none;
+    padding: 4px 8px;
+    border: 1px solid transparent;
     border-radius: 3px;
-    font-weight: 500;
     font-size: 13px;
-    transition: all 0.2s ease;
+    font-weight: 400;
+    transition: all 0.15s ease;
     cursor: pointer;
+    background: transparent;
   }
   .new-task-actions button:first-child {
-    background: #36B37E;
-    color: white;
+    color: #36B37E;
   }
   .new-task-actions button:first-child:hover {
-    background: #2ea06e;
-    box-shadow: 0 2px 4px rgba(54, 179, 126, 0.25);
+    background: rgba(54, 179, 126, 0.1);
+    border-color: #36B37E;
   }
   .cancel-button {
-    background: #ebecf0;
-    color: #42526e;
+    color: #42526E;
   }
   .cancel-button:hover {
-    background: #ff5630;
-    color: white;
-    box-shadow: 0 2px 4px rgba(255, 86, 48, 0.25);
+    background: rgba(255, 86, 48, 0.1);
+    border-color: #FF5630;
+    color: #FF5630;
   }
   @keyframes slideIn {
     from {
