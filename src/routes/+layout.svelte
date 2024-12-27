@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   // Determine if the CommonLayout should be shown based on the route
-  $: showCommonLayout = ['/home', '/teams', '/about', '/neotaskmaster', '/neometrics'].some(route => $page.url.pathname.startsWith(route));
+  $: showCommonLayout = ['/home', '/teams', '/about', '/neotaskmaster'].some(route => $page.url.pathname.startsWith(route));
 </script>
 
 <div class="min-h-screen bg-gray-100">
