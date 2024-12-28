@@ -32,13 +32,23 @@
   }
 
   function handleDragStart(event) {
-    isDragging = true;
-    event.dataTransfer.setData('taskId', task.id);
+    const taskData = {
+      id: task.id,
+      title: task.title,
+      columnId: task.columnId,
+      priority: task.priority,
+      size: task.size,
+      deadline: task.deadline,
+      assignee: task.assignee
+    };
+    
+    event.dataTransfer.setData('application/json', JSON.stringify(taskData));
     event.dataTransfer.effectAllowed = 'move';
+    event.target.classList.add('is-dragging');
   }
 
-  function handleDragEnd() {
-    isDragging = false;
+  function handleDragEnd(event) {
+    event.target.classList.remove('is-dragging');
   }
 
   function saveEdit() {
