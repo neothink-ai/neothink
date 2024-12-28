@@ -1,7 +1,7 @@
 <script>
     import { user } from '$lib/stores/userStore.js';
     import Sidebar from '../neometrics/components/Sidebar.svelte';
-    import ProfileMenu from '../home/components/ProfileMenu.svelte';
+    import ProfileMenu from '$lib/components/ProfileMenu.svelte';
     import { writable } from 'svelte/store';
 
     let sidebarOpen = writable(false);
@@ -57,7 +57,7 @@
     }
 
     .profile-menu {
-        position: absolute;
+        position: fixed; /* Change to fixed */
         top: 10px;
         right: 10px; /* Position it in the top right corner */
     }
