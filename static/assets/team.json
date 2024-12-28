@@ -1,0 +1,145 @@
+{
+    "team": "Tech Titans",
+    "teamLeader": "Shrukie",
+    "members": [
+      {
+        "name": "Shrukie",
+        "performanceSummary": {
+          "overallEfficiency": 85.0,
+          "tasksCompleted": 35,
+          "currentWorkload": 5,
+          "topPerformer": false
+        },
+        "taskDistribution": {
+          "byStatus": {
+            "pending": 2,
+            "inProgress": 3,
+            "completed": 35
+          },
+          "byPriority": {
+            "high": 5,
+            "medium": 8,
+            "low": 2
+          }
+        },
+        "timeTracking": {
+          "totalHoursLogged": 85,
+          "overtimeMetrics": 10,
+          "idleTime": 3
+        }
+      },
+      {
+        "name": "Chirasya",
+        "performanceSummary": {
+          "overallEfficiency": 80.0,
+          "tasksCompleted": 30,
+          "currentWorkload": 6,
+          "topPerformer": false
+        },
+        "taskDistribution": {
+          "byStatus": {
+            "pending": 3,
+            "inProgress": 6,
+            "completed": 30
+          },
+          "byPriority": {
+            "high": 4,
+            "medium": 10,
+            "low": 2
+          }
+        },
+        "timeTracking": {
+          "totalHoursLogged": 75,
+          "overtimeMetrics": 8,
+          "idleTime": 4
+        }
+      },
+      {
+        "name": "Hema",
+        "performanceSummary": {
+          "overallEfficiency": 92.0,
+          "tasksCompleted": 45,
+          "currentWorkload": 4,
+          "topPerformer": true
+        },
+        "taskDistribution": {
+          "byStatus": {
+            "pending": 1,
+            "inProgress": 4,
+            "completed": 45
+          },
+          "byPriority": {
+            "high": 6,
+            "medium": 10,
+            "low": 5
+          }
+        },
+        "timeTracking": {
+          "totalHoursLogged": 90,
+          "overtimeMetrics": 12,
+          "idleTime": 2
+        }
+      },
+      {
+        "name": "Raghav",
+        "performanceSummary": {
+          "overallEfficiency": 75.0,
+          "tasksCompleted": 15,
+          "currentWorkload": 5,
+          "topPerformer": false
+        },
+        "taskDistribution": {
+          "byStatus": {
+            "pending": 4,
+            "inProgress": 5,
+            "completed": 15
+          },
+          "byPriority": {
+            "high": 3,
+            "medium": 2,
+            "low": 4
+          }
+        },
+        "timeTracking": {
+          "totalHoursLogged": 70,
+          "overtimeMetrics": 10,
+          "idleTime": 6
+        }
+      }
+    ],
+    "performanceSummary": {
+      "overallEfficiency": 82.5,
+      "tasksCompleted": 125,
+      "currentWorkload": 20,
+      "topPerformer": {
+        "name": "Hema",
+        "metrics": {
+          "tasksCompleted": 45,
+          "efficiency": 92.0
+        }
+      }
+    },
+    "projectStatus": {
+      "totalActiveProjects": 4,
+      "completionRates": 76.0,
+      "delayedProjects": 1
+    },
+    "taskDistribution": {
+      "byStatus": {
+        "pending": 10,
+        "inProgress": 20,
+        "completed": 125
+      },
+      "byPriority": {
+        "high": 15,
+        "medium": 30,
+        "low": 10
+      }
+    },
+    "timeTracking": {
+      "totalHoursLogged": 320,
+      "overtimeMetrics": 40,
+      "idleTime": 15
+    }
+  }
+  
