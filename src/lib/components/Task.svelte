@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import TaskModal from './TaskModal.svelte';
   
   export let task;
   export let onEditTask;
@@ -11,24 +12,11 @@
   let isDragging = false;
   let showModal = false;
 
-  // New task details
-  let taskDetails = {
-    priority: task.priority || 'Medium',
-    deadline: task.deadline || '',
-    size: task.size || 'Medium',
-    assignee: task.assignee || '',
-  };
-
-  function toggleModal() {
-    showModal = !showModal;
-  }
-
-  function saveTaskDetails() {
+  function handleTaskUpdate(event) {
     dispatch('updateTask', {
       ...task,
-      ...taskDetails
+      ...event.detail
     });
-    toggleModal();
   }
 
   function handleDragStart(event) {
@@ -69,46 +57,12 @@
   }
 </script>
 
-<!-- Add modal markup -->
-{#if showModal}
-  <div class="modal-backdrop" on:click|self={toggleModal}>
-    <div class="modal">
-      <h3>Task Details</h3>
-      <div class="form-group">
-        <label for="priority">Priority</label>
-        <select bind:value={taskDetails.priority}>
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="deadline">Deadline</label>
-        <input type="datetime-local" bind:value={taskDetails.deadline}>
-      </div>
-
-      <div class="form-group">
-        <label for="size">Size</label>
-        <select bind:value={taskDetails.size}>
-          <option value="Small">Small</option>
-          <option value="Medium">Medium</option>
-          <option value="Large">Large</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="assignee">Assignee</label>
-        <input type="text" bind:value={taskDetails.assignee}>
-      </div>
-
-      <div class="modal-actions">
-        <button on:click={saveTaskDetails}>Save</button>
-        <button on:click={toggleModal}>Cancel</button>
-      </div>
-    </div>
-  </div>
-{/if}
+<TaskModal 
+  {task} 
+  show={showModal} 
+  on:close={() => showModal = false}
+  on:save={handleTaskUpdate}
+/>
 
 <li
   class="task {isDragging ? 'is-dragging' : ''}"
@@ -127,7 +81,7 @@
   {:else}
     <span on:dblclick|stopPropagation={() => isEditing = true}>{task.title}</span>
     <div class="task-actions">
-      <button class="details-button" on:click={toggleModal}>Details</button>
+      <button class="details-button" on:click={() => showModal = true}>Details</button>
       <button 
         class="delete-button"
         on:click={handleDelete}
