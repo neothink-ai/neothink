@@ -1,28 +1,57 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { tasks, taskStore } from '$lib/stores/taskStore';  // Add this import
   
   export let task;
   export let show = false;
+  export let onAddTask;
+  let title = '';
+  let columnId = 'todo';
 
   const dispatch = createEventDispatcher();
+  let isUpdating = false;
+  let error = null;
   
   let taskDetails = {
     title: task.title || '',
     priority: task.priority || 'Medium',
-    deadline: task.deadline || '',
+    deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '',
     size: task.size || 'Medium',
     assignee: task.assignee || '',
-    description: task.description || '',
-    labels: task.labels || []
+    description: task.description || ''
   };
 
   function close() {
+    error = null;
     dispatch('close');
   }
 
-  function saveChanges() {
-    dispatch('save', taskDetails);
-    close();
+  async function saveChanges() {
+    isUpdating = true;
+    error = null;
+
+    try {
+      const updates = {
+        ...taskDetails,
+        deadline: taskDetails.deadline ? new Date(taskDetails.deadline).toISOString() : null,
+        columnId: task.columnId // Ensure columnId is included
+      };
+
+      // Use taskStore instead of direct fetch
+      const updatedTask = await taskStore.updateTask(task.id, updates);
+      dispatch('taskUpdated', updatedTask);
+      close();
+    } catch (err) {
+      error = err.message;
+      console.error('Error updating task:', err);
+    } finally {
+      isUpdating = false;
+    }
+  }
+
+  function handleSubmit() {
+    onAddTask(title, columnId);
+    title = '';
   }
 </script>
 
@@ -35,6 +64,12 @@
       </header>
 
       <div class="modal-body">
+        {#if error}
+          <div class="error-message" transition:fade>
+            {error}
+          </div>
+        {/if}
+
         <div class="modal-section">
           <h3>Details</h3>
           <div class="form-grid">
@@ -93,12 +128,37 @@
       </div>
 
       <footer class="modal-footer">
-        <button class="secondary" on:click={close}>Cancel</button>
-        <button class="primary" on:click={saveChanges}>Save Changes</button>
+        <button 
+          class="secondary" 
+          on:click={close}
+          disabled={isUpdating}
+        >
+          Cancel
+        </button>
+        <button 
+          class="primary" 
+          on:click={saveChanges}
+          disabled={isUpdating}
+        >
+          {#if isUpdating}
+            <span class="spinner"></span>
+          {/if}
+          {isUpdating ? 'Saving...' : 'Save Changes'}
+        </button>
       </footer>
     </div>
   </div>
 {/if}
+
+<div class="modal">
+  <input type="text" bind:value={title} placeholder="Task title" />
+  <select bind:value={columnId}>
+    <option value="todo">To Do</option>
+    <option value="inProgress">In Progress</option>
+    <option value="done">Done</option>
+  </select>
+  <button on:click={handleSubmit}>Add Task</button>
+</div>
 
 <style>
   .modal-backdrop {
@@ -233,5 +293,40 @@
 
   .close-button:hover {
     background: rgba(9, 30, 66, 0.08);
+  }
+
+  .error-message {
+    background: #ffebe6;
+    color: #de350b;
+    padding: 8px 12px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .modal {
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #ddd;
   }
 </style>
