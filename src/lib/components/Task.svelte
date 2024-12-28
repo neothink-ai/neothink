@@ -69,6 +69,7 @@
   draggable="true"
   on:dragstart={handleDragStart}
   on:dragend={handleDragEnd}
+  on:click={() => showModal = true}
   data-task-id={task.id}
 >
   {#if isEditing}
