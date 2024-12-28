@@ -7,14 +7,14 @@
   $: showCommonLayout = ['/home', '/teams', '/about', '/neotaskmaster', '/kanban'].some(route => $page.url.pathname.startsWith(route));
 </script>
 
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen">
   {#if showCommonLayout}
     <CommonLayout>
       <slot />
     </CommonLayout>
   {:else}
     <main class="flex-1">
-      <div class="w-full py-6 sm:px-6 lg:px-8">
+      <div class="w-full">
         <slot />
       </div>
     </main>

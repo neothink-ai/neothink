@@ -1,8 +1,6 @@
 <script>
     import { authHandlers, error } from "$lib/backend/authStore";
-    import {signIn} from '$lib/backend/auth'; 
-    import { navigate } from "svelte-routing";
-    import { Router, Route } from "svelte-routing"; // Add Route here
+    import { signIn } from '$lib/backend/auth'; 
   
     let email = "";
     let password = "";
@@ -29,7 +27,7 @@
         console.error("Google login failed:", err);
       }
     }
-  </script>
+</script>
   
   
   <!-- Loader Section -->
@@ -40,9 +38,9 @@
   <!-- Main Container (Login Form) -->
   <div class="container">
     <div class="header">
-      <img src="assets/neothink.png" alt="Logo" class="logo" />
+      <img src="assets/neothink.png" alt="Logo" class="logo" style="display: block; margin: 0 auto;" />
     </div>
-    <h2>Log In</h2>
+    <h2 style="font-family: 'Open Sans', sans-serif;">Log In</h2>
     <form on:submit|preventDefault={handleLogin}>
       <label for="email">Email</label>
       <input type="email" id="email" name="email" bind:value={email} required />
@@ -80,7 +78,7 @@
     </div>
   
     <p>
-      Don't have an account? <a href='/sign-up'>Sign Up!</a>
+      Don't have an account? <a href='/sign-up' style="color: #7743e0;">Sign Up!</a>
   
       {#if $error}
         <p class="error">{$error}</p>
@@ -91,13 +89,12 @@
   <!-- Styles for Login.svelte -->
   <style>
     /* General Body Styles */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+    :root(body) {
+      font-family: 'Open Sans', sans-serif;
       margin: 0;
       padding: 0;
     }
-  
+
     /* Loader Styles */
     .loader {
       position: fixed;
@@ -116,7 +113,7 @@
         opacity 0.3s ease,
         visibility 0.3s ease;
     }
-  
+
     .spinner {
       border: 8px solid #f3f3f3;
       border-top: 8px solid #8b61c2;
@@ -125,7 +122,7 @@
       height: 60px;
       animation: spin 2s linear infinite;
     }
-  
+
     @keyframes spin {
       0% {
         transform: rotate(0deg);
@@ -134,34 +131,34 @@
         transform: rotate(360deg);
       }
     }
-  
+
     body.loading #loader {
       visibility: visible;
       opacity: 1;
     }
-  
+
     /* Container Style */
     .container {
       max-width: 400px;
       margin: 50px auto;
       margin-top: 2%;
-      background-color: #fff;
       padding: 20px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       border-radius: 12px;
+      background-color: white;
     }
-  
+
     /* Header Style */
     .header {
       text-align: center;
       margin-bottom: 20px;
     }
-  
+
     .logo {
       width: 150px;
       height: auto;
     }
-  
+
     /* Header Text Style */
     h2 {
       font-family: "Cormorant Garamond", serif;
@@ -170,18 +167,18 @@
       margin-bottom: 20px;
       color: #333;
     }
-  
+
     /* Form Style */
     form {
       display: flex;
       flex-direction: column;
     }
-  
+
     label {
       margin-bottom: 5px;
       color: #333;
     }
-  
+
     input {
       margin-bottom: 15px;
       padding: 12px;
@@ -190,28 +187,28 @@
       border-radius: 8px;
       transition: border-color 0.3s ease;
     }
-  
+
     input:focus {
       border-color: #8b61c2;
       outline: none;
     }
-  
+
     /* Submit Button Style */
     button {
       padding: 12px;
       font-size: 16px;
       color: #fff;
-      background-color: #8b61c2;
+      background-color: #7743e0;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-  
+
     button:hover {
-      background-color: #7a4fa2;
+      background-color: #5513d8;
     }
-  
+
     /* OAuth Buttons Style */
     .oauth-buttons {
       display: flex;
@@ -219,7 +216,7 @@
       gap: 10px;
       margin-top: 20px;
     }
-  
+
     .oauth {
       padding: 10px 12px;
       font-size: 14px;
@@ -236,47 +233,47 @@
       width: 32%;
       color: #000;
     }
-  
+
     .oauth:hover {
       transform: translateY(-5px);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-  
+
     .google:hover {
       border-color: #db4437;
       background-color: #f4b8b1;
     }
-  
+
     .microsoft:hover {
       border-color: #00a4ef;
       background-color: #aad8f7;
     }
-  
+
     .twitter:hover {
       border-color: #1da1f2;
       background-color: #a6d8f7;
     }
-  
+
     .oauth-logo {
       width: 24px;
       margin-right: 10px;
     }
-  
+
     /* Footer Link Style */
     p {
       text-align: center;
       margin-top: 20px;
     }
-  
+
     a {
       color: #8b61c2;
       text-decoration: none;
     }
-  
+
     a:hover {
       text-decoration: underline;
     }
-  
+
     /* Error message style */
     .error {
       color: red;
@@ -284,4 +281,3 @@
       margin-top: 10px;
     }
   </style>
-  
