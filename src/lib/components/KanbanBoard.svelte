@@ -1,5 +1,6 @@
 <script>
   import Column from '$lib/components/Column.svelte';
+  import { taskStore } from '$lib/stores/taskStore';
   import { onMount } from 'svelte';
 
   export let columns = [
@@ -10,6 +11,11 @@
 
   let tasks = [];  // Initialize empty tasks array
   let isDragging = false;
+
+  // Subscribe to the store
+  taskStore.subscribe(value => {
+    tasks = value;
+  });
 
   function handleDragStart() {
     isDragging = true;
@@ -124,7 +130,7 @@
       console.log('Raw tasks data:', data);  // Debug log
 
       if (Array.isArray(data)) {
-        tasks = data.map(task => ({
+        const processedTasks = data.map(task => ({
           id: task._id.$oid,  // MongoDB ID
           title: task.title,
           columnId: task.columnId,
@@ -136,6 +142,7 @@
           assigned_time: task.assigned_time,
           completed_time: task.completed_time
         }));
+        taskStore.set(processedTasks);
         console.log('Processed tasks:', tasks);  // Debug log
       }
     } catch (error) {
