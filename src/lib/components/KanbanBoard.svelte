@@ -89,9 +89,26 @@
     saveTasks();
   }
 
-  function deleteTask(taskId) {
-    tasks = tasks.filter(task => task.id !== taskId);
-    saveTasks();
+  async function deleteTask(taskId) {
+    try {
+      const response = await fetch(`http://localhost:6876/tasks/${taskId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Remove from local state
+      tasks = tasks.filter(task => task.id !== taskId);
+      
+      console.log('Task deleted successfully');
+      
+      // Refresh tasks from server
+      await loadTasks();
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   }
 
   async function loadTasks() {

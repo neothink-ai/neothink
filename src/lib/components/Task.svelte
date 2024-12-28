@@ -116,13 +116,16 @@
     <button on:click|stopPropagation={cancelEdit}>Cancel</button>
   {:else}
     <span on:dblclick|stopPropagation={() => isEditing = true}>{task.title}</span>
-    <button 
-      class="delete-button"
-      on:click|stopPropagation={handleDelete}
-    >
-      Delete
-    </button>
-    <button class="details-button" on:click={toggleModal}>Details</button>
+    <div class="task-actions">
+      <button 
+        class="delete-button"
+        on:click={handleDelete}
+        title="Delete task"
+      >
+        Delete
+      </button>
+      <button class="details-button" on:click={toggleModal}>Details</button>
+    </div>
   {/if}
 </li>
 
@@ -251,5 +254,10 @@
 
   .details-button:hover {
     background: rgba(9, 30, 66, 0.08);
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 8px;
   }
 </style>
