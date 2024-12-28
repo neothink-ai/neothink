@@ -1,0 +1,27 @@
+{
+    "name": "Shrukie",
+    "personalTaskSummary": {
+      "tasksAssigned": 40,
+      "tasksCompleted": 35,
+      "pendingTasks": 5,
+      "efficiencyScore": 85.0
+    },
+    "timeTrackingInsights": {
+      "totalHoursWorked": 85,
+      "averageTaskTime": 2.43,
+      "overtime": 10,
+      "idleTime": 3
+    },
+    "performanceMetrics": {
+      "completionRate": 85.0,
+      "topAchievements": [
+        "Successfully led a critical project to completion ahead of schedule.",
+        "Improved team collaboration through effective communication strategies."
+      ],
+      "improvementAreas": [
+        "Enhance time management to reduce idle time.",
+        "Work on faster task completion for high-priority assignments."
+      ]
+    }
+  }
+  

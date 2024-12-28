@@ -101,7 +101,7 @@
 <div class="sidebar {isSidebarOpen ? 'open' : ''}">
     <img src="/assets/neometrics.png" alt="Neometrics Logo">
     <a href="/home" class="menu-item" class:active={activeItem === 'home'} on:click={() => activeItem = 'home'}>Home Page</a>
-    <button type="button" class="menu-item" class:active={activeItem === 'analytics'} on:click={() => activeItem = 'analytics'} aria-role="button">Analytics Overview</button>
+    <a href="/neometrics" class="menu-item" class:active={activeItem === 'analytics'} on:click={() => activeItem = 'analytics'}>Analytics Overview</a>
     <button type="button" class="menu-item" class:active={activeItem === 'individual'} on:click={() => activeItem = 'individual'} aria-role="button">Individual Performance</button>
     <button type="button" class="menu-item" class:active={activeItem === 'team'} on:click={() => activeItem = 'team'} aria-role="button">Team Performance</button>
     <button type="button" class="menu-item" class:active={activeItem === 'project'} on:click={() => activeItem = 'project'} aria-role="button">Project Insights</button>
