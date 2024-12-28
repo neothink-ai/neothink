@@ -1,29 +1,36 @@
+
 from fastapi import APIRouter, HTTPException
-from models.tasks import Task
-from database import Database
+from typing import List
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 import json
 
-router = APIRouter(
-    prefix="/tasks",
-    tags=["tasks"]
-)
+from database import Database
+from models.tasks import Task
 
+router = APIRouter()
 db = Database.get_db()
 
-@router.get("")
+@router.get("/tasks")
 async def get_tasks():
     try:
         tasks_collection = db["Tasks"]["tasks"]
         cursor = tasks_collection.find()
         tasks_list = list(cursor)
+        print("MongoDB connection:", db)  # Debug log
+        print("Collection:", tasks_collection)  # Debug log
+        print("Raw tasks from MongoDB:", tasks_list)  # Debug log
+        
+        # Convert MongoDB cursor to list and then to JSON
         serialized_tasks = json.loads(dumps(tasks_list))
+        print("Serialized tasks:", serialized_tasks)  # Debug log
+        
         return serialized_tasks
     except Exception as e:
+        print(f"Error in get_tasks: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("")
+@router.post("/tasks")
 async def create_task(task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
@@ -43,7 +50,7 @@ async def create_task(task: Task):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/{task_id}")
+@router.put("/tasks/{task_id}")
 async def update_task(task_id: str, task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
@@ -58,20 +65,18 @@ async def update_task(task_id: str, task: Task):
             "priority": task.priority,
             "columnID": task.columnID
         }
-        result = tasks_collection.update_one(
-            {"_id": obj_id}, 
-            {"$set": update_data}
-        )
-        if result.modified_count == 0:
+        result = tasks_collection.update_one({"_id": obj_id}, {"$set": update_data})
+        if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Task not found")
-        return {"status": "success", "columnID": task.columnID}
+        return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.delete("/{task_id}")
+@router.delete("/tasks/{task_id}")
 async def delete_task(task_id: str):
     try:
-        tasks_collection = db["Tasks"]["tasks"]
+        tasks_db = db["Tasks"]
+        tasks_collection = tasks_db["tasks"]
         result = tasks_collection.delete_one({"_id": ObjectId(task_id)})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Task not found")
