@@ -112,7 +112,7 @@
             const data = await response.json();
             
             if (data.performanceSummary?.topPerformer) {
-                data.performanceSummary.topPerformer.photo = "static/assets/hema.jpg";
+                data.performanceSummary.topPerformer.photo = "/assets/hema.jpg";
             }
             
             teamData = data;
