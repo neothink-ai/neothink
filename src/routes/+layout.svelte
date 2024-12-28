@@ -9,7 +9,7 @@
 
 <div class="min-h-screen">
   {#if showCommonLayout}
-    <CommonLayout>
+    <CommonLayout pageType={$page.url.pathname.slice(1)}>
       <slot />
     </CommonLayout>
   {:else}

@@ -4,21 +4,39 @@
   import TopBar from '$lib/components/TopBar.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { user } from '$lib/stores/userStore';
+  import { user, isLoading } from '$lib/stores/userStore';
 
-  
+  export let pageType = 'home'; // Default value
+
+  let sidebarAppType;
+
+  $: {
+    if (pageType === 'home') {
+      sidebarAppType = 'neotaskmaster';
+    } else if (pageType === 'about') {
+      sidebarAppType = 'neothink';
+    } else if (pageType === 'neometrics') {
+      sidebarAppType = 'neometrics';
+    } else if (pageType === 'kanban') {
+      sidebarAppType = 'neoplan';
+    } else {
+      sidebarAppType = 'neoplan'; // Default value
+    }
+  }
+
   onMount(() => {
-    console.log($user)
-    // if (!$user) {
-    //   goto('/login');
+    console.log($user);
+    console.log($isLoading);
+    // if (!$user && !$isLoading) {
+    //   goto('/login');``
     // }
   });
 </script>
 
 <div class="min-h-screen bg-gray-100">
-  <TopBar />
+  <TopBar logoType={sidebarAppType}/>
   <div class="flex">
-    <Sidebar />
+    <Sidebar  />
     <main class="flex-1">
       <div class="w-full max-w-9x2 mx-auto py-6 sm:px-6 lg:px-8">
         <slot />

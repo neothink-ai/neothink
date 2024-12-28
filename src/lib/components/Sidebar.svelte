@@ -8,89 +8,55 @@
     isSidebarOpen = !isSidebarOpen;
   }
 
-  let accentColor;
-
-  $: {
-    if (appType === 'neoplan') {
-      accentColor = 'bg-yellow-500';
-    } else if (appType === 'neotaskmaster') {
-      accentColor = 'bg-red-500';
-    } else if (appType === 'neometrics') {
-      accentColor = 'bg-green-500';
-    } else {
-      accentColor = 'bg-gray-800'; // Default color
-    }
-  }
 </script>
 
 <div class="overlay {isSidebarOpen ? 'open' : ''}" on:click={toggleSidebar}></div>
 
-<div class="sidebar {isSidebarOpen ? 'open' : 'collapsed'} {accentColor}">
-  <img src="/assets/neothink.png" alt="App Logo" class="logo">
-  <button type="button" class="menu-item" class:active={activeItem === 'neothink'} on:click={() => activeItem = 'neothink'} aria-role="button">
+<div class="sidebar {isSidebarOpen ? 'open' : 'collapsed'}" on:mouseenter={() => isSidebarOpen = true} on:mouseleave={() => isSidebarOpen = false}>
+
+  <button type="button" class="menu-item neothink" class:active={activeItem === 'neothink'} on:click={() => activeItem = 'neothink'} aria-role="button">
     <img src="/assets/neothink_cropped.png" alt="Neothink Icon" class="icon" />
     <span>Neothink</span>
   </button>
   <div class="menu-center">
-    <button type="button" class="menu-item" class:active={activeItem === 'neometrics'} on:click={() => activeItem = 'neometrics'} aria-role="button">
-      <img src="/assets/neometrics_cropped.png" alt="Neometrics Icon" class="icon" />
-      <span>Neometrics</span>
-    </button>
-    <button type="button" class="menu-item" class:active={activeItem === 'neoplan'} on:click={() => activeItem = 'neoplan'} aria-role="button">
+    <button type="button" class="menu-item neoplan" on:click={() => activeItem = 'neoplan'} aria-role="button">
       <img src="/assets/neoplan_cropped.png" alt="Neoplan Icon" class="icon" />
       <span>Neoplan</span>
     </button>
-    <button type="button" class="menu-item" class:active={activeItem === 'neotaskmaster'} on:click={() => activeItem = 'neotaskmaster'} aria-role="button">
+    <button type="button" class="menu-item neotaskmaster" on:click={() => activeItem = 'neotaskmaster'} aria-role="button">
       <img src="/assets/neotaskmaster_cropped.png" alt="Neotaskmaster Icon" class="icon" />
       <span>Neotaskmaster</span>
+    </button>
+    <button type="button" class="menu-item neometrics" on:click={() => activeItem = 'neometrics'} aria-role="button">
+      <img src="/assets/neometrics_cropped.png" alt="Neometrics Icon" class="icon" />
+      <span>Neometrics</span>
     </button>
   </div>
 </div>
 
-<button class="toggle-button" on:click={toggleSidebar}>
-  {isSidebarOpen ? '<' : '>'}
-</button>
 
 <style>
-  .bg-yellow-500 {
-    background-color: #f59e0b;
-  }
-  .bg-red-500 {
-    background-color: #ef4444;
-  }
-  .bg-green-500 {
-    background-color: #10b981;
-  }
-  .bg-gray-800 {
-    background-color: #1f2937;
-  }
 
   .sidebar {
     position: fixed;
     left: 0;
-    top: 0;
-    height: 100%;
-    width: 300px;
+    top: 64px; /* Adjust to match the height of the topbar */
+    height: calc(100% - 64px); /* Adjust to match the height of the topbar */
+    width: 80px;
     background-color: #f3f4f6;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
-    transform: translateX(-100%);
+    transition: width 0.3s;
     z-index: 1000;
   }
 
   .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar.collapsed {
-    width: 80px;
-    transform: translateX(0);
+    width: 25vh;
   }
 
   .menu-item {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     color: black;
     padding: 10px 0;
@@ -106,7 +72,9 @@
   .menu-item.active {
     color: #00bf63;
   }
-
+  .menu-center {
+    padding-top: 25vh;
+  }
   .menu-item.active::before {
     content: '';
     position: absolute;
@@ -121,19 +89,16 @@
     margin-top: 10px;
   }
 
-  .toggle-button {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background-color: #f3f4f6;
-    color: black;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    z-index: 1001;
-    font-weight: bold;
+  .menu-item.neoplan:hover {
+    color: #cbcb40;
   }
 
+  .menu-item.neothink:hover {
+    color: #7743e0;
+  }
+  .menu-item.neotaskmaster:hover {
+    color: red;
+  }
   .overlay {
     position: fixed;
     top: 0;
@@ -152,15 +117,9 @@
     pointer-events: auto;
   }
 
-  .sidebar img.logo {
-    max-width: 100%;
-    margin-top: 30px;
-    margin-bottom: 50px;
-  }
-
   .icon {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     margin-right: 10px;
   }
 
