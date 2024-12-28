@@ -3,6 +3,8 @@
   import ProfileMenu from './ProfileMenu.svelte';
 
   export let logoType = ''; // Default value
+  console.log("Received logo type"); 
+  console.log(logoType);
 </script>
 
 <header class="bg-white shadow-sm">

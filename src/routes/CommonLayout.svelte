@@ -7,7 +7,8 @@
   import { user, isLoading } from '$lib/stores/userStore';
 
   export let pageType = 'home'; // Default value
-
+  console.log("Printing page type");
+  console.log(pageType);
   let sidebarAppType;
 
   $: {
@@ -15,7 +16,8 @@
       sidebarAppType = 'neotaskmaster';
     } else if (pageType === 'about') {
       sidebarAppType = 'neothink';
-    } else if (pageType === 'neometrics') {
+    } else if (pageType === 'neometrics' || pageType === 'neometrics/personal' || pageType === 'neometrics/team') {
+      console.log("Setting it to neometrics");
       sidebarAppType = 'neometrics';
     } else if (pageType === 'kanban') {
       sidebarAppType = 'neoplan';

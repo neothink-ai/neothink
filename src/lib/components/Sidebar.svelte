@@ -1,4 +1,6 @@
 <script>
+  import { fade } from 'svelte/transition';
+
   export let appType = 'neoplan'; // Default value
 
   let activeItem = 'home';
@@ -7,7 +9,6 @@
   function toggleSidebar() {
     isSidebarOpen = !isSidebarOpen;
   }
-
 </script>
 
 <div class="overlay {isSidebarOpen ? 'open' : ''}" on:click={toggleSidebar}></div>
@@ -19,18 +20,26 @@
     <span>Neothink</span>
   </button>
   <div class="menu-center">
-    <button type="button" class="menu-item neoplan" on:click={() => activeItem = 'neoplan'} aria-role="button">
+    <button type="button" class="menu-item neoplan" on:click={() => { activeItem = 'neoplan'; window.location.href = '/kanban'; }} aria-role="button">
       <img src="/assets/neoplan_cropped.png" alt="Neoplan Icon" class="icon" />
       <span>Neoplan</span>
     </button>
-    <button type="button" class="menu-item neotaskmaster" on:click={() => activeItem = 'neotaskmaster'} aria-role="button">
+    <button type="button" class="menu-item neotaskmaster" on:click={() => { activeItem = 'neotaskmaster'; window.location.href = '/home'; }} aria-role="button">
       <img src="/assets/neotaskmaster_cropped.png" alt="Neotaskmaster Icon" class="icon" />
       <span>Neotaskmaster</span>
     </button>
-    <button type="button" class="menu-item neometrics" on:click={() => activeItem = 'neometrics'} aria-role="button">
+    <button type="button" class="menu-item neometrics" on:click={() => { activeItem = 'neometrics';}} aria-role="button">
       <img src="/assets/neometrics_cropped.png" alt="Neometrics Icon" class="icon" />
       <span>Neometrics</span>
     </button>
+    {#if activeItem === 'neometrics'}
+      <button type="button" class="menu-item personal-view" transition:fade on:click={() => window.location.href = '/neometrics/personal'}>
+      <span style="margin-left: 40px;">Personal View</span>
+      </button>
+      <button type="button" class="menu-item team-view" transition:fade on:click={() => window.location.href = '/neometrics/team'}>
+      <span style="margin-left: 40px;">Team View</span>
+      </button>
+    {/if}
   </div>
 </div>
 
