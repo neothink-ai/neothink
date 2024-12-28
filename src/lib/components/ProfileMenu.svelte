@@ -1,6 +1,6 @@
 <script>
   import { user } from '$lib/stores/userStore';
-  import { logOut } from '$lib/firebase/auth';
+  import { logOut } from '$lib/backend/auth';
   
   let isOpen = false;
   

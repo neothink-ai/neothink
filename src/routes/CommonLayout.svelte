@@ -1,7 +1,18 @@
 <script>
   import '../app.css';
-  import Sidebar from './home/components/Sidebar.svelte';
+  import Sidebar from '../lib/components/Sidebar.svelte';
   import TopBar from '$lib/components/TopBar.svelte';
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { user } from '$lib/stores/userStore';
+
+  
+  onMount(() => {
+    console.log($user)
+    // if (!$user) {
+    //   goto('/login');
+    // }
+  });
 </script>
 
 <div class="min-h-screen bg-gray-100">

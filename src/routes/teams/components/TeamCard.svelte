@@ -1,5 +1,5 @@
 <script>
-  import { addMemberToTeam, removeMemberFromTeam } from '$lib/firebase/teams';
+  import { addMemberToTeam, removeMemberFromTeam } from '$lib/backend/teams';
   
   export let team;
   export let isAdmin = false;

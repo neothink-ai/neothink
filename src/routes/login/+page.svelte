@@ -1,6 +1,6 @@
 <script>
-    import { authHandlers, error } from "$lib/firebase/authStore";
-    import {signIn} from '$lib/firebase/auth'; 
+    import { authHandlers, error } from "$lib/backend/authStore";
+    import {signIn} from '$lib/backend/auth'; 
     import { navigate } from "svelte-routing";
     import { Router, Route } from "svelte-routing"; // Add Route here
   
@@ -12,7 +12,7 @@
       try {
         await signIn(email, password);
         // Redirect to home page or dashboard
-        window.location.href = "/";
+        window.location.href = "/home";
       } catch (err) {
         console.error("Login failed:", err);
         $error = "Invalid email or password.";

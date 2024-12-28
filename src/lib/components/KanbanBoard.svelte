@@ -8,10 +8,7 @@
     { id: 'done', title: 'Done' }
   ];
 
-  export let tasks = [
-    { id: 'task1', title: 'First Task', columnId: 'todo' }
-  ];
-
+  let tasks = [];  // Initialize empty tasks array
   let isDragging = false;
 
   function handleDragStart() {
@@ -22,45 +19,67 @@
     isDragging = false;
   }
 
-  function addTask(title, columnId) {
-    const newTask = {
-      id: `task${tasks.length + 1}`,
-      title,
-      columnId
-    };
-    tasks = [...tasks, newTask];
-    saveTasks();
+  async function addTask(title, columnId) {
+    try {
+      const taskData = {
+        title,
+        columnId,
+        state: columnId,
+        priority: 'Medium',
+        size: 'Medium',
+        deadline: null,
+        assignee: null,
+        assigned_time: new Date().toISOString(),
+        completed_time: null
+      };
+
+      console.log('Sending task data:', taskData); // Debug log
+
+      const response = await fetch('http://localhost:6876/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(taskData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      await loadTasks();
+    } catch (error) {
+      console.error('Failed to add task:', error);
+    }
   }
 
-  function moveTask(taskId, newColumnId, targetIndex) {
-    const taskToMove = tasks.find(t => t.id === taskId);
-    if (!taskToMove) return;
+  async function moveTask(taskId, newColumnId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
 
-    const updatedTasks = tasks.filter(t => t.id !== taskId);
-    const targetColumnTasks = updatedTasks.filter(t => t.columnId === newColumnId);
-    
-    // Calculate the actual index in the full tasks array
-    let insertAtIndex;
-    if (targetIndex === 0) {
-      // Insert at the beginning of the column
-      insertAtIndex = updatedTasks.findIndex(t => t.columnId === newColumnId);
-      if (insertAtIndex === -1) insertAtIndex = updatedTasks.length;
-    } else if (targetIndex >= targetColumnTasks.length) {
-      // Insert at the end of the column
-      const lastColumnTask = [...targetColumnTasks].pop();
-      insertAtIndex = lastColumnTask 
-        ? updatedTasks.indexOf(lastColumnTask) + 1 
-        : updatedTasks.length;
-    } else {
-      // Insert at specific position
-      const targetTask = targetColumnTasks[targetIndex];
-      insertAtIndex = updatedTasks.indexOf(targetTask);
+    try {
+      const response = await fetch(`http://localhost:6876/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: task.title,
+          columnId: newColumnId,
+          state: newColumnId,
+          priority: task.priority || 'Medium',
+          size: task.size || 'Medium',
+          deadline: task.deadline || null,
+          assignee: task.assignee || null,
+          assigned_time: task.assigned_time,
+          completed_time: newColumnId === 'done' ? new Date().toISOString() : null
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      await loadTasks();
+    } catch (error) {
+      console.error('Failed to move task:', error);
     }
-
-    // Insert the task at the calculated position
-    updatedTasks.splice(insertAtIndex, 0, { ...taskToMove, columnId: newColumnId });
-    tasks = updatedTasks;
-    saveTasks();
   }
 
   function editTask(taskId, newTitle) {
@@ -70,19 +89,54 @@
     saveTasks();
   }
 
-  function deleteTask(taskId) {
-    tasks = tasks.filter(task => task.id !== taskId);
-    saveTasks();
+  async function deleteTask(taskId) {
+    try {
+      const response = await fetch(`http://localhost:6876/tasks/${taskId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Remove from local state
+      tasks = tasks.filter(task => task.id !== taskId);
+      
+      console.log('Task deleted successfully');
+      
+      // Refresh tasks from server
+      await loadTasks();
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   }
 
-  function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
+  async function loadTasks() {
+    try {
+      const response = await fetch('http://localhost:6876/tasks');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Raw tasks data:', data);  // Debug log
 
-  function loadTasks() {
-    const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      tasks = JSON.parse(savedTasks);
+      if (Array.isArray(data)) {
+        tasks = data.map(task => ({
+          id: task._id.$oid,  // MongoDB ID
+          title: task.title,
+          columnId: task.columnId,
+          state: task.state,
+          priority: task.priority,
+          size: task.size,
+          deadline: task.deadline,
+          assignee: task.assignee,
+          assigned_time: task.assigned_time,
+          completed_time: task.completed_time
+        }));
+        console.log('Processed tasks:', tasks);  // Debug log
+      }
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
     }
   }
 
@@ -99,7 +153,7 @@
   {#each columns as column}
     <Column
       {column}
-      {tasks}
+      tasks={tasks.filter(task => task.columnId === column.id)}
       on:addTask={(event) => addTask(event.detail.title, column.id)}
       on:moveTask={(event) => moveTask(
         event.detail.taskId, 

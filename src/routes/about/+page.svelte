@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/userStore';
-  import { getUserProfile, updateUserProfile, getUserTeamsDetails } from '$lib/firebase/users';
+  import { getUserProfile, updateUserProfile, getUserTeamsDetails } from '$lib/backend/users';
   
   let profile = null;
   let teams = [];
@@ -15,15 +15,15 @@
       try {
         const userData = await getUserProfile($user.uid);
         profile = userData;
-        console.log(typeof(profile))
-        console.log(profile)
+        // console.log(typeof(profile))
+        // console.log(profile)
         
         if (userData.teams?.length) {
           teams = await getUserTeamsDetails($user.uid);
         }
-        console.log(profile.teams);
-        console.log("teams: ");
-        console.log(teams);
+        // console.log(profile.teams);
+        // console.log("teams: ");
+        // console.log(teams);
       } catch (err) {
         error = err.message;
       } finally {
