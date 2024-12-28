@@ -5,7 +5,6 @@
   
 
   export let column;
-  /** @type {Array<{ id: string, columnId: string, title: string }>} */
   export let tasks = [];
 
   const dispatch = createEventDispatcher();
@@ -16,6 +15,11 @@
   let isAddingTaskAtBottom = false;
   let bottomInputRef;
   let inputTimeout;
+
+  $: columnTasks = tasks;
+  $: taskCount = columnTasks.length;
+
+  console.log(`Column ${column.id} tasks:`, columnTasks); // Debug log
 
   function handleAddTask() {
     if (newTaskTitle.trim()) {
@@ -111,9 +115,6 @@
   $: if (isAddingTaskAtBottom) {
     setTimeout(() => bottomInputRef?.focus(), 0);
   }
-
-  $: taskCount = tasks.filter(task => task.columnId === column.id).length;
-  $: columnTasks = tasks.filter(task => task.columnId === column.id);
 
   onDestroy(() => {
     clearInputTimeout();

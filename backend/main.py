@@ -173,10 +173,19 @@ async def update_profile(user_id: str, profile: UserProfileUpdate):
 async def get_tasks():
     try:
         tasks_collection = db["Tasks"]["tasks"]
-        data = tasks_collection.find()
-        return json.loads(dumps(data))
+        cursor = tasks_collection.find()
+        tasks_list = list(cursor)
+        print("MongoDB connection:", db)  # Debug log
+        print("Collection:", tasks_collection)  # Debug log
+        print("Raw tasks from MongoDB:", tasks_list)  # Debug log
+        
+        # Convert MongoDB cursor to list and then to JSON
+        serialized_tasks = json.loads(dumps(tasks_list))
+        print("Serialized tasks:", serialized_tasks)  # Debug log
+        
+        return serialized_tasks
     except Exception as e:
-        print(f"Error fetching tasks: {e}")  # Debug log
+        print(f"Error in get_tasks: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/tasks")

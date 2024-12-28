@@ -8,7 +8,7 @@
     { id: 'done', title: 'Done' }
   ];
 
-  let tasks = [];
+  let tasks = [];  // Initialize empty tasks array
   let isDragging = false;
 
   function handleDragStart() {
@@ -101,12 +101,23 @@
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Loaded tasks:', data); // Debug log
-      tasks = data.map(task => ({
-        ...task,
-        id: task._id.$oid,
-        columnId: task.state || task.columnId
-      }));
+      console.log('Raw tasks data:', data);  // Debug log
+
+      if (Array.isArray(data)) {
+        tasks = data.map(task => ({
+          id: task._id.$oid,  // MongoDB ID
+          title: task.title,
+          columnId: task.columnId,
+          state: task.state,
+          priority: task.priority,
+          size: task.size,
+          deadline: task.deadline,
+          assignee: task.assignee,
+          assigned_time: task.assigned_time,
+          completed_time: task.completed_time
+        }));
+        console.log('Processed tasks:', tasks);  // Debug log
+      }
     } catch (error) {
       console.error('Failed to load tasks:', error);
     }
@@ -125,7 +136,7 @@
   {#each columns as column}
     <Column
       {column}
-      {tasks}
+      tasks={tasks.filter(task => task.columnId === column.id)}
       on:addTask={(event) => addTask(event.detail.title, column.id)}
       on:moveTask={(event) => moveTask(
         event.detail.taskId, 
