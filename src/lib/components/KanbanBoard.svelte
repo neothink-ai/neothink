@@ -22,45 +22,48 @@
     isDragging = false;
   }
 
-  function addTask(title, columnId) {
-    const newTask = {
-      id: `task${tasks.length + 1}`,
-      title,
-      columnId
-    };
-    tasks = [...tasks, newTask];
-    saveTasks();
+  async function addTask(title, columnId) {
+    try {
+      const response = await fetch('http://localhost:6876/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          columnId,
+          priority: 'Medium',
+          size: 'Medium',
+          assigned_time: new Date().toISOString()
+        })
+      });
+      
+      if (response.ok) {
+        await loadTasks();
+      }
+    } catch (error) {
+      console.error('Failed to add task:', error);
+    }
   }
 
-  function moveTask(taskId, newColumnId, targetIndex) {
-    const taskToMove = tasks.find(t => t.id === taskId);
-    if (!taskToMove) return;
+  async function moveTask(taskId, newColumnId, targetIndex) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
 
-    const updatedTasks = tasks.filter(t => t.id !== taskId);
-    const targetColumnTasks = updatedTasks.filter(t => t.columnId === newColumnId);
-    
-    // Calculate the actual index in the full tasks array
-    let insertAtIndex;
-    if (targetIndex === 0) {
-      // Insert at the beginning of the column
-      insertAtIndex = updatedTasks.findIndex(t => t.columnId === newColumnId);
-      if (insertAtIndex === -1) insertAtIndex = updatedTasks.length;
-    } else if (targetIndex >= targetColumnTasks.length) {
-      // Insert at the end of the column
-      const lastColumnTask = [...targetColumnTasks].pop();
-      insertAtIndex = lastColumnTask 
-        ? updatedTasks.indexOf(lastColumnTask) + 1 
-        : updatedTasks.length;
-    } else {
-      // Insert at specific position
-      const targetTask = targetColumnTasks[targetIndex];
-      insertAtIndex = updatedTasks.indexOf(targetTask);
+    try {
+      const response = await fetch(`http://localhost:6876/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...task,
+          columnId: newColumnId
+        })
+      });
+
+      if (response.ok) {
+        await loadTasks();
+      }
+    } catch (error) {
+      console.error('Failed to move task:', error);
     }
-
-    // Insert the task at the calculated position
-    updatedTasks.splice(insertAtIndex, 0, { ...taskToMove, columnId: newColumnId });
-    tasks = updatedTasks;
-    saveTasks();
   }
 
   function editTask(taskId, newTitle) {
@@ -75,14 +78,18 @@
     saveTasks();
   }
 
-  function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
-
-  function loadTasks() {
-    const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      tasks = JSON.parse(savedTasks);
+  async function loadTasks() {
+    try {
+      const response = await fetch('http://localhost:6876/tasks');
+      if (response.ok) {
+        const data = await response.json();
+        tasks = data.map(task => ({
+          ...task,
+          id: task._id.$oid // Convert MongoDB ObjectId to string
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
     }
   }
 

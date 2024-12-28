@@ -1,11 +1,35 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
+  
   export let task;
   export let onEditTask;
   export let onDeleteTask;
 
+  const dispatch = createEventDispatcher();
   let isEditing = false;
   let editedTitle = task.title;
   let isDragging = false;
+  let showModal = false;
+
+  // New task details
+  let taskDetails = {
+    priority: task.priority || 'Medium',
+    deadline: task.deadline || '',
+    size: task.size || 'Medium',
+    assignee: task.assignee || '',
+  };
+
+  function toggleModal() {
+    showModal = !showModal;
+  }
+
+  function saveTaskDetails() {
+    dispatch('updateTask', {
+      ...task,
+      ...taskDetails
+    });
+    toggleModal();
+  }
 
   function handleDragStart(event) {
     isDragging = true;
@@ -35,6 +59,47 @@
   }
 </script>
 
+<!-- Add modal markup -->
+{#if showModal}
+  <div class="modal-backdrop" on:click|self={toggleModal}>
+    <div class="modal">
+      <h3>Task Details</h3>
+      <div class="form-group">
+        <label for="priority">Priority</label>
+        <select bind:value={taskDetails.priority}>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="deadline">Deadline</label>
+        <input type="datetime-local" bind:value={taskDetails.deadline}>
+      </div>
+
+      <div class="form-group">
+        <label for="size">Size</label>
+        <select bind:value={taskDetails.size}>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="assignee">Assignee</label>
+        <input type="text" bind:value={taskDetails.assignee}>
+      </div>
+
+      <div class="modal-actions">
+        <button on:click={saveTaskDetails}>Save</button>
+        <button on:click={toggleModal}>Cancel</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <li
   class="task {isDragging ? 'is-dragging' : ''}"
   draggable="true"
@@ -57,6 +122,7 @@
     >
       Delete
     </button>
+    <button class="details-button" on:click={toggleModal}>Details</button>
   {/if}
 </li>
 
@@ -127,5 +193,63 @@
     color: #172b4d;
     flex: 1;
     padding: 2px 4px;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 300px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .details-button {
+    margin-left: 8px;
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    color: #42526e;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  .details-button:hover {
+    background: rgba(9, 30, 66, 0.08);
   }
 </style>

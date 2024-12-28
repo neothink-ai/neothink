@@ -6,6 +6,7 @@ import json
 from pymongo import MongoClient
 from bson.json_util import dumps
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 
 app = FastAPI()
 app.add_middleware(
@@ -32,6 +33,17 @@ class UserProfileUpdate(BaseModel):
     department: Optional[str]
     skills: Optional[List[str]]
     teams: Optional[List[str]]
+
+# Task model
+class Task(BaseModel):
+    title: str
+    columnId: str
+    priority: Optional[str]
+    deadline: Optional[datetime]
+    size: Optional[str]
+    assignee: Optional[str]
+    assigned_time: Optional[datetime]
+    completed_time: Optional[datetime]
 
 @app.post("/process-json")
 async def process_json(item: Item):
@@ -154,6 +166,57 @@ async def update_profile(user_id: str, profile: UserProfileUpdate):
     except Exception as e:
         # print("Encountered error: ")
         # print(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/tasks")
+async def get_tasks():
+    try:
+        tasks_db = client["Tasks"]
+        tasks_collection = tasks_db["tasks"]
+        data = tasks_collection.find()
+        return json.loads(dumps(data))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/tasks")
+async def create_task(task: Task):
+    try:
+        tasks_db = client["Tasks"]
+        tasks_collection = tasks_db["tasks"]
+        task_dict = task.model_dump()
+        task_dict["assigned_time"] = datetime.now()
+        result = tasks_collection.insert_one(task_dict)
+        return {"id": str(result.inserted_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/tasks/{task_id}")
+async def update_task(task_id: str, task: Task):
+    try:
+        tasks_db = client["Tasks"]
+        tasks_collection = tasks_db["tasks"]
+        from bson.objectid import ObjectId
+        result = tasks_collection.update_one(
+            {"_id": ObjectId(task_id)},
+            {"$set": task.model_dump()}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/tasks/{task_id}")
+async def delete_task(task_id: str):
+    try:
+        tasks_db = client["Tasks"]
+        tasks_collection = tasks_db["tasks"]
+        from bson.objectid import ObjectId
+        result = tasks_collection.delete_one({"_id": ObjectId(task_id)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return {"status": "success"}
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
