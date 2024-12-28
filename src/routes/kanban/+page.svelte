@@ -1,6 +1,7 @@
 <script>
   import KanbanBoard from '$lib/components/KanbanBoard.svelte';
   import { onMount } from 'svelte';
+  import { getAuth } from 'firebase/auth'; // Import Firebase auth
 
   let columns = [
     { id: 'todo', title: 'To Do' },
@@ -8,41 +9,29 @@
     { id: 'done', title: 'Done' }
   ];
 
-  let tasks = [
-    { id: 'task1', title: 'First Task', columnId: 'todo' },
-    // Add more tasks as needed
-  ];
+  let tasks = [];
 
-  function addTask(title, columnId) {
-    const newTask = {
-      id: `task${tasks.length + 1}`,
-      title,
-      columnId
-    };
-    tasks = [...tasks, newTask];
-    saveTasks();
-  }
-
-  function moveTask(taskId, newColumnId) {
-    tasks = tasks.map(task =>
-      task.id === taskId ? { ...task, columnId: newColumnId } : task
-    );
-    saveTasks();
-  }
-
-  function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
-
-  function loadTasks() {
-    const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      tasks = JSON.parse(savedTasks);
+  async function fetchTasks(userid) {
+    try {
+      const response = await fetch(`http://localhost:6876/tasks?userid=${userid}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      tasks = data;
+    } catch (error) {
+      console.error('Failed to fetch tasks:', error);
     }
   }
 
-  onMount(() => {
-    loadTasks();
+  onMount(async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      await fetchTasks(user.uid);
+    } else {
+      console.error('User not logged in');
+    }
   });
 </script>
 
