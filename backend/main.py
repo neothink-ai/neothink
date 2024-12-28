@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Any, Dict, Optional, List
 import requests
 import json
-from pymongo import MongoClient
+from database import Database
 from bson.json_util import dumps
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
@@ -16,9 +16,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# MongoDB setup
-client = MongoClient("mongodb+srv://neothink_deploy:neothinkisthebest@neothink.xnzwv.mongodb.net/?retryWrites=true&w=majority&appName=neothink")
 
+# Remove the direct client connection and use Database class instead
+db = Database.get_db()
 
 # Pydantic model for incoming JSON data
 class Item(BaseModel):
@@ -67,7 +67,7 @@ async def process_json(item: Item):
 @app.get("/fetch-mongodb")
 async def fetch_mongodb():
     try:
-        users_db = client["Users"]
+        users_db = db["Users"]
         collection = users_db["user_data"]
         data = collection.find()
         json_data = dumps(data)
@@ -79,7 +79,7 @@ async def fetch_mongodb():
 async def fetch_user(user_id: str):
     # print(f"Received fetch-user request: {user_id}")
     try:
-        users_db = client["Users"]
+        users_db = db["Users"]
         user_data_collection = users_db["user_data"]
         data = user_data_collection.find_one({"user_id": user_id})
         if data:
@@ -94,7 +94,7 @@ async def fetch_user(user_id: str):
 async def fetch_teams(user_id: str):
     # print(f"Received fetch-teams request: {user_id}")
     try:
-        teams_db = client["Teams"]
+        teams_db = db["Teams"]
         teams_collection = teams_db["teams"]
         data = teams_collection.find({"users": user_id})
         json_data = dumps(data)
@@ -106,7 +106,7 @@ async def fetch_teams(user_id: str):
 @app.post("/add-user-to-team/{team_id}/{user_id}")
 async def add_user_to_team(team_id: str, user_id: str):
     try:
-        teams_db = client["Teams"]
+        teams_db = db["Teams"]
         teams_collection = teams_db["teams"]
         result = teams_collection.update_one(
             {"team_id": team_id},
@@ -121,7 +121,7 @@ async def add_user_to_team(team_id: str, user_id: str):
 @app.post("/remove-user-from-team/{team_id}/{user_id}")
 async def remove_user_from_team(team_id: str, user_id: str):
     try:
-        teams_db = client["Teams"]
+        teams_db = db["Teams"]
         teams_collection = teams_db["teams"]
         result = teams_collection.update_one(
             {"team_id": team_id},
@@ -136,7 +136,7 @@ async def remove_user_from_team(team_id: str, user_id: str):
 @app.get("/fetch-all-teams")
 async def fetch_all_teams():
     try:
-        teams_db = client["Teams"]
+        teams_db = db["Teams"]
         teams_collection = teams_db["teams"]
         data = teams_collection.find()
         json_data = dumps(data)
@@ -151,7 +151,7 @@ async def update_profile(user_id: str, profile: UserProfileUpdate):
     # print(profile.model_dump_json())
     # print(type(profile.model_dump()))
     try:
-        users_db = client["Users"]
+        users_db = db["Users"]
         user_data_collection = users_db["user_data"]
         # print("Collection fetched. Performing update")
         result = user_data_collection.update_one(
@@ -171,17 +171,17 @@ async def update_profile(user_id: str, profile: UserProfileUpdate):
 @app.get("/tasks")
 async def get_tasks():
     try:
-        tasks_db = client["Tasks"]
-        tasks_collection = tasks_db["tasks"]
+        tasks_collection = db["tasks"]
         data = tasks_collection.find()
         return json.loads(dumps(data))
     except Exception as e:
+        logger.error(f"Error fetching tasks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/tasks")
 async def create_task(task: Task):
     try:
-        tasks_db = client["Tasks"]
+        tasks_db = db["Tasks"]
         tasks_collection = tasks_db["tasks"]
         task_dict = task.model_dump()
         task_dict["assigned_time"] = datetime.now()
@@ -193,7 +193,7 @@ async def create_task(task: Task):
 @app.put("/tasks/{task_id}")
 async def update_task(task_id: str, task: Task):
     try:
-        tasks_db = client["Tasks"]
+        tasks_db = db["Tasks"]
         tasks_collection = tasks_db["tasks"]
         from bson.objectid import ObjectId
         result = tasks_collection.update_one(
@@ -209,7 +209,7 @@ async def update_task(task_id: str, task: Task):
 @app.delete("/tasks/{task_id}")
 async def delete_task(task_id: str):
     try:
-        tasks_db = client["Tasks"]
+        tasks_db = db["Tasks"]
         tasks_collection = tasks_db["tasks"]
         from bson.objectid import ObjectId
         result = tasks_collection.delete_one({"_id": ObjectId(task_id)})
@@ -218,6 +218,10 @@ async def delete_task(task_id: str):
         return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.on_event("shutdown")
+async def shutdown_event():
+    Database.close_connection()
     
 if __name__ == "__main__":
     import uvicorn
