@@ -8,10 +8,7 @@
     { id: 'done', title: 'Done' }
   ];
 
-  export let tasks = [
-    { id: 'task1', title: 'First Task', columnId: 'todo' }
-  ];
-
+  let tasks = [];
   let isDragging = false;
 
   function handleDragStart() {
@@ -24,27 +21,38 @@
 
   async function addTask(title, columnId) {
     try {
+      const taskData = {
+        title,
+        columnId,
+        state: columnId,
+        priority: 'Medium',
+        size: 'Medium',
+        deadline: null,
+        assignee: null,
+        assigned_time: new Date().toISOString(),
+        completed_time: null
+      };
+
+      console.log('Sending task data:', taskData); // Debug log
+
       const response = await fetch('http://localhost:6876/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          columnId,
-          priority: 'Medium',
-          size: 'Medium',
-          assigned_time: new Date().toISOString()
-        })
+        body: JSON.stringify(taskData)
       });
       
-      if (response.ok) {
-        await loadTasks();
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      await loadTasks();
     } catch (error) {
       console.error('Failed to add task:', error);
     }
   }
 
-  async function moveTask(taskId, newColumnId, targetIndex) {
+  async function moveTask(taskId, newColumnId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
@@ -53,14 +61,22 @@
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...task,
-          columnId: newColumnId
+          title: task.title,
+          columnId: newColumnId,
+          state: newColumnId,
+          priority: task.priority || 'Medium',
+          size: task.size || 'Medium',
+          deadline: task.deadline || null,
+          assignee: task.assignee || null,
+          assigned_time: task.assigned_time,
+          completed_time: newColumnId === 'done' ? new Date().toISOString() : null
         })
       });
 
-      if (response.ok) {
-        await loadTasks();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      await loadTasks();
     } catch (error) {
       console.error('Failed to move task:', error);
     }
@@ -81,13 +97,16 @@
   async function loadTasks() {
     try {
       const response = await fetch('http://localhost:6876/tasks');
-      if (response.ok) {
-        const data = await response.json();
-        tasks = data.map(task => ({
-          ...task,
-          id: task._id.$oid // Convert MongoDB ObjectId to string
-        }));
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      console.log('Loaded tasks:', data); // Debug log
+      tasks = data.map(task => ({
+        ...task,
+        id: task._id.$oid,
+        columnId: task.state || task.columnId
+      }));
     } catch (error) {
       console.error('Failed to load tasks:', error);
     }
