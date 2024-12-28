@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/userStore';
-  import { getUserProfile, updateUserProfile, getUserTeamsDetails } from '$lib/firebase/users';
+  import { getUserProfile, updateUserProfile, getUserTeamsDetails } from '$lib/backend/users';
   
   let profile = null;
   let teams = [];

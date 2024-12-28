@@ -1,10 +1,6 @@
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:5000';
-
-import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db } from './firebase';
-
 // Remove getUserTeams function
 
 export async function getAllTeams() {

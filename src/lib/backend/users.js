@@ -36,3 +36,23 @@ export async function getUserTeamsDetails(userId) {
     throw new Error('Error fetching user teams: ' + error.message);
   }
 }
+
+export async function getUserTasks(userId) {
+  try {
+    const response = await axios.get(`${BASE_URL}/fetch-tasks/${userId}`);
+    let return_data = JSON.parse(response.data);
+    return return_data;
+  } catch (error) {
+    throw new Error('Error fetching user tasks: ' + error.message);
+  }
+}
+
+export async function getUserTasksForDate(userId, date) {
+  try {
+    const response = await axios.get(`${BASE_URL}/fetch-task-on-date/${userId}/${date}`);
+    let return_data = JSON.parse(response.data);
+    return return_data;
+  } catch (error) {
+    throw new Error('Error fetching user tasks for date: ' + error.message);
+  }
+}

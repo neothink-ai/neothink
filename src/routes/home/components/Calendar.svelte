@@ -2,8 +2,9 @@
 	import { onMount } from 'svelte';
 	import { getDaysInMonth, formatDate } from '$lib/utils/date';
 	import TaskModal from './TaskModal.svelte';
-	import { auth } from '$lib/firebase/firebase';
-	import { getTasksForDate } from '$lib/firebase/tasks';
+	import { auth } from '$lib/backend/firebase';
+	import {getUserTasksForDate} from '$lib/backend/users';
+	import {user} from '$lib/stores/userStore';
 	
 	let currentDate = new Date();
 	let daysInMonth = [];
@@ -97,6 +98,7 @@
 </div>
 
 {#if selectedDate}
+	tasks = getUserTasksForDate($user.uid, selectedDate.toISOString());
 	<TaskModal
 		{tasks}
 		{selectedDate}
@@ -104,5 +106,6 @@
 			selectedDate = null;
 			tasks = [];
 		}}
+	/>
 	/>
 {/if}

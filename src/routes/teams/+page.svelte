@@ -2,8 +2,8 @@
   //teams page
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/userStore';
-  import { getUserTeamsDetails } from '$lib/firebase/users';
-  import { getAllTeams } from '$lib/firebase/teams';
+  import { getUserTeamsDetails } from '$lib/backend/users';
+  import { getAllTeams } from '$lib/backend/teams';
 
   let userTeams = [];
   let allTeams = [];

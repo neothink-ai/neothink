@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { auth } from '../firebase/firebase';
+import { auth } from '../backend/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export const user = writable(null);

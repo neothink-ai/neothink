@@ -8,9 +8,9 @@
 // }
 
 export const PRIORITY = {
-	HIGH: 4, // Green
-	MEDIUM: 2, // Yellow
-	LOW: 1 // Red
+	LOW: 5, // Green
+	MEDIUM: 3, // Yellow
+	HIGH: 1 // Red
 };
 
 export function createTask(task_no, description, timestamp, priority, hours) {

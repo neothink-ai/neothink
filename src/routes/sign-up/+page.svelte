@@ -1,8 +1,8 @@
 
 <script>
 	// Sign up page svelte
-	import { authHandlers, error } from "$lib/firebase/authStore";
-	import { signUp } from '$lib/firebase/auth';
+	import { authHandlers, error } from "$lib/backend/authStore";
+	import { signUp } from '$lib/backend/auth';
   
 	let email = "";
 	let password = "";

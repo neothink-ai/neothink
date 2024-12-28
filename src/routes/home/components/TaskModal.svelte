@@ -1,8 +1,7 @@
 <script>
 	import { fade, fly } from 'svelte/transition';
 	import { PRIORITY } from '$lib/models/task';
-	import { addTask } from '$lib/firebase/tasks';
-	import { auth } from '$lib/firebase/firebase';
+	import { auth } from '$lib/backend/firebase';
 	
 	export let tasks = [];
 	export let onClose = () => {};
@@ -10,7 +9,7 @@
 	
 	let isAddingTask = false;
 	let newTask = {
-		task_no: '',
+		task_name: '',
 		description: '',
 		timestamp: '',
 		priority: PRIORITY.MEDIUM,
@@ -29,20 +28,21 @@
 			
 			// Set the date from selectedDate but keep the time from the time input
 			const taskDate = new Date(selectedDate);
-			const timeDate = new Date(newTask.timestamp);
-			taskDate.setHours(timeDate.getHours(), timeDate.getMinutes());
+			const [hours, minutes] = newTask.timestamp.split(':').map(Number);
+			taskDate.setHours(hours, minutes);
+			
 			
 			const taskData = {
 				...newTask,
 				timestamp: taskDate.toISOString(),
-				task_no: parseInt(newTask.task_no),
 				hours: parseFloat(newTask.hours)
 			};
+			console.log(taskData);
 			
 			await addTask(auth.currentUser.uid, taskData);
 			isAddingTask = false;
 			newTask = {
-				task_no: '',
+				task_name: '',
 				description: '',
 				timestamp: '',
 				priority: PRIORITY.MEDIUM,
@@ -74,7 +74,7 @@
 				class="text-gray-500 hover:text-gray-700"
 				on:click={onClose}
 			>
-				✕
+					✕
 			</button>
 		</div>
 		
@@ -83,7 +83,7 @@
 				{#each tasks as task}
 					<div class="p-4 rounded-lg border {getPriorityColor(task.priority)}">
 						<div class="flex justify-between items-start">
-							<span class="text-sm font-medium">Task #{task.task_no}</span>
+							<span class="text-sm font-medium">{task.task_name}</span>
 							<span class="text-sm text-gray-500">
 								{new Date(task.timestamp).toLocaleTimeString()}
 							</span>
@@ -112,15 +112,14 @@
 				on:submit|preventDefault={handleAddTask}
 			>
 				<div>
-					<label for="task_no" class="block text-sm font-medium text-gray-700">
-						Task Number
+					<label for="task_name" class="block text-sm font-medium text-gray-700">
+						Task Name
 					</label>
 					<input
-						type="number"
-						id="task_no"
-						bind:value={newTask.task_no}
-						class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-						required
+						type="text"
+						id="task_name"
+						bind:value={newTask.task_name}
+						class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 					/>
 				</div>
 				
@@ -175,9 +174,11 @@
 						class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
 						required
 					>
-						<option value={PRIORITY.HIGH}>High</option>
-						<option value={PRIORITY.MEDIUM}>Medium</option>
-						<option value={PRIORITY.LOW}>Low</option>
+						<option value="1">1 (Low)</option>
+						<option value="2">2</option>
+						<option value="3">3 (Medium)</option>
+						<option value="4">4</option>
+						<option value="5">5 (High)</option>
 					</select>
 				</div>
 				
