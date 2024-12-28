@@ -15,6 +15,7 @@
   let isAddingTaskAtBottom = false;
   let bottomInputRef;
   let inputTimeout;
+  let isDropTarget = false;
 
   $: columnTasks = tasks;
   $: taskCount = columnTasks.length;
@@ -30,50 +31,30 @@
 
   function handleDragOver(event) {
     event.preventDefault();
-    const columnTasks = tasks.filter(task => task.columnId === column.id);
-    const taskElements = Array.from(event.currentTarget.querySelectorAll('.task'));
-    const mouseY = event.clientY;
-    
-    // Throttle the drag over calculations
-    if (dropTarget && dropTarget === event.target) {
-      return;
-    }
-    dropTarget = event.target;
-    
-    let newDragOverIndex = -1;
-    
-    for (let i = 0; i < taskElements.length; i++) {
-      const rect = taskElements[i].getBoundingClientRect();
-      const threshold = rect.top + (rect.height * 0.5);
-      
-      if (mouseY < threshold) {
-        newDragOverIndex = i;
-        break;
-      }
-    }
-    
-    if (newDragOverIndex === -1) {
-      newDragOverIndex = columnTasks.length;
-    }
-    
-    dragOverIndex = newDragOverIndex;
+    isDropTarget = true;
+    event.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDragLeave() {
+    isDropTarget = false;
   }
 
   function handleDrop(event) {
     event.preventDefault();
-    const taskId = event.dataTransfer.getData('taskId');
-    const currentTask = tasks.find(t => t.id === taskId);
+    isDropTarget = false;
     
-    // Only dispatch if we're actually moving the task
-    if (currentTask && (currentTask.columnId !== column.id || dragOverIndex !== -1)) {
-      dispatch('moveTask', { 
-        taskId, 
-        newColumnId: column.id,
-        targetIndex: dragOverIndex
-      });
+    try {
+      const taskData = JSON.parse(event.dataTransfer.getData('application/json'));
+      if (taskData.columnId !== column.id) {
+        dispatch('moveTask', {
+          taskId: taskData.id,
+          newColumnId: column.id,
+          taskData: taskData
+        });
+      }
+    } catch (error) {
+      console.error('Drop error:', error);
     }
-    
-    dragOverIndex = -1;
   }
 
   function handleEditTask(taskId, newTitle) {
@@ -122,10 +103,10 @@
 </script>
 
 <div
-  class="column"
+  class="column {isDropTarget ? 'drop-target' : ''}"
   on:drop={handleDrop}
   on:dragover={handleDragOver}
-  on:dragleave={() => dragOverIndex = -1}
+  on:dragleave={handleDragLeave}
   role="list"
 >
   <div class="column-header">
@@ -445,5 +426,10 @@
 
   .add-button:hover {
     background: #2ea06e;
+  }
+
+  .drop-target {
+    background-color: #e3fcef;
+    border: 2px dashed #36B37E;
   }
 </style>

@@ -32,13 +32,23 @@
   }
 
   function handleDragStart(event) {
-    isDragging = true;
-    event.dataTransfer.setData('taskId', task.id);
+    const taskData = {
+      id: task.id,
+      title: task.title,
+      columnId: task.columnId,
+      priority: task.priority,
+      size: task.size,
+      deadline: task.deadline,
+      assignee: task.assignee
+    };
+    
+    event.dataTransfer.setData('application/json', JSON.stringify(taskData));
     event.dataTransfer.effectAllowed = 'move';
+    event.target.classList.add('is-dragging');
   }
 
-  function handleDragEnd() {
-    isDragging = false;
+  function handleDragEnd(event) {
+    event.target.classList.remove('is-dragging');
   }
 
   function saveEdit() {
@@ -117,14 +127,27 @@
   {:else}
     <span on:dblclick|stopPropagation={() => isEditing = true}>{task.title}</span>
     <div class="task-actions">
+      <button class="details-button" on:click={toggleModal}>Details</button>
       <button 
         class="delete-button"
         on:click={handleDelete}
         title="Delete task"
       >
-        Delete
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke-width="1.5" 
+          stroke="currentColor" 
+          class="delete-icon"
+        >
+          <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" 
+          />
+        </svg>
       </button>
-      <button class="details-button" on:click={toggleModal}>Details</button>
     </div>
   {/if}
 </li>
@@ -258,6 +281,21 @@
 
   .task-actions {
     display: flex;
-    gap: 8px;
+    gap: 4px;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .delete-icon {
+    width: 20px;
+    height: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
   }
 </style>

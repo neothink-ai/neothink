@@ -38,13 +38,6 @@ class UserProfileUpdate(BaseModel):
 class Task(BaseModel):
     title: str
     columnId: str
-    state: str  # Add state field
-    priority: str = Field(default="Medium")
-    deadline: Optional[str] = None  # Change from datetime to str
-    size: str = Field(default="Medium")
-    assignee: Optional[str] = None
-    assigned_time: Optional[str] = None  # Change from datetime to str
-    completed_time: Optional[str] = None  # Change from datetime to str
 
 @app.post("/process-json")
 async def process_json(item: Item):
@@ -192,29 +185,28 @@ async def get_tasks():
 async def create_task(task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
-        task_dict = task.model_dump()
-        task_dict["assigned_time"] = datetime.now().isoformat()  # Convert to ISO string
-        if task_dict["state"] == "done":
-            task_dict["completed_time"] = datetime.now().isoformat()  # Convert to ISO string
-        print(f"Creating task: {task_dict}")  # Debug log
+        # Only store title & columnId
+        task_dict = {
+            "title": task.title,
+            "columnId": task.columnId
+        }
         result = tasks_collection.insert_one(task_dict)
-        return {"id": str(result.inserted_id)}
+        return {"inserted_id": str(result.inserted_id)}
     except Exception as e:
-        print(f"Error creating task: {e}")  # Debug log
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/tasks/{task_id}")
 async def update_task(task_id: str, task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
-        task_dict = task.model_dump()
-        if task_dict["state"] == "done":
-            task_dict["completed_time"] = datetime.now()
         from bson.objectid import ObjectId
-        result = tasks_collection.update_one(
-            {"_id": ObjectId(task_id)},
-            {"$set": task_dict}
-        )
+        obj_id = ObjectId(task_id)
+        # Only update title & columnId
+        update_data = {
+            "title": task.title,
+            "columnId": task.columnId
+        }
+        result = tasks_collection.update_one({"_id": obj_id}, {"$set": update_data})
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Task not found")
         return {"status": "success"}

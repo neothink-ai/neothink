@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   export let columns = [
-    { id: 'todo', title: 'To Do' },
+    { id: 'backlog', title: 'Backlog' },
     { id: 'inProgress', title: 'In Progress' },
     { id: 'done', title: 'Done' }
   ];
@@ -52,33 +52,36 @@
     }
   }
 
-  async function moveTask(taskId, newColumnId) {
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
-
+  async function moveTask(event) {
+    const { taskId, newColumnId, taskData } = event.detail;
+    
     try {
+      // Optimistically update UI
+      tasks = tasks.map(t => 
+        t.id === taskId ? { ...t, columnId: newColumnId } : t
+      );
+
       const response = await fetch(`http://localhost:6876/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: task.title,
-          columnId: newColumnId,
-          state: newColumnId,
-          priority: task.priority || 'Medium',
-          size: task.size || 'Medium',
-          deadline: task.deadline || null,
-          assignee: task.assignee || null,
-          assigned_time: task.assigned_time,
-          completed_time: newColumnId === 'done' ? new Date().toISOString() : null
+          ...taskData,
+          columnId: newColumnId
         })
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Revert on failure
+        tasks = tasks.map(t => 
+          t.id === taskId ? { ...t, columnId: taskData.columnId } : t
+        );
+        throw new Error(`Failed to update task: ${response.statusText}`);
       }
+
+      // Refresh tasks to ensure consistency
       await loadTasks();
     } catch (error) {
-      console.error('Failed to move task:', error);
+      console.error('Move task error:', error);
     }
   }
 
@@ -155,11 +158,7 @@
       {column}
       tasks={tasks.filter(task => task.columnId === column.id)}
       on:addTask={(event) => addTask(event.detail.title, column.id)}
-      on:moveTask={(event) => moveTask(
-        event.detail.taskId, 
-        column.id, 
-        event.detail.targetIndex
-      )}
+      on:moveTask={moveTask}
       on:editTask={(event) => editTask(event.detail.taskId, event.detail.newTitle)}
       on:deleteTask={(event) => deleteTask(event.detail.taskId)}
     />
