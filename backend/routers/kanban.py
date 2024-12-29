@@ -33,11 +33,16 @@ async def get_tasks(userid: Optional[str] = None):
         query = {"userid": userid} if userid else {}
         cursor = tasks_collection.find(query)
         tasks_list = list(cursor)
-        if not tasks_list and userid:
-            return []  # Return empty list instead of 404 for no tasks
+        
+        # Convert tasks to JSON-serializable format
         serialized_tasks = json.loads(dumps(tasks_list))
+        
+        # Log for debugging
+        print(f"Fetched tasks for user {userid}:", serialized_tasks)
+        
         return serialized_tasks
     except Exception as e:
+        print(f"Error fetching tasks: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("")

@@ -109,7 +109,10 @@
 
   async function loadTasks() {
     try {
-      const response = await fetch('http://localhost:6876/tasks');
+      const user = $authStore.user;
+      if (!user) return;
+
+      const response = await fetch(`http://localhost:6876/tasks?userid=${user.uid}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -118,7 +121,7 @@
 
       if (Array.isArray(data)) {
         const processedTasks = data.map(task => ({
-          id: task._id.$oid,  // MongoDB ID
+          id: task._id.$oid,
           title: task.title,
           columnId: task.columnId,
           state: task.state,
@@ -126,11 +129,12 @@
           size: task.size,
           deadline: task.deadline,
           assignee: task.assignee,
+          userid: task.userid,
           assigned_time: task.assigned_time,
-          completed_time: task.completed_time
+          completed_time: task.completed_time,
+          description: task.description
         }));
-        taskStore.set(processedTasks);
-        console.log('Processed tasks:', tasks);  // Debug log
+        taskStore.setTasks(processedTasks);
       }
     } catch (error) {
       console.error('Failed to load tasks:', error);
@@ -138,15 +142,14 @@
   }
 
   onMount(async () => {
-    try {
-      const response = await fetch('http://localhost:6876/tasks');
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const data = await response.json();
-      taskStore.setTasks(data);
-    } catch (err) {
-      console.error('Failed to load tasks:', err);
+    if ($authStore.user) {
+      await loadTasks();
     }
   });
+
+  $: if ($authStore.user) {
+    loadTasks();
+  }
 
   $: isAuthenticated = $authStore.user !== null;
 

@@ -2,7 +2,11 @@ import { writable } from 'svelte/store';
 import { getAuth } from 'firebase/auth';
 
 function createTaskStore() {
-    const { subscribe, set, update } = writable([]);
+    const { subscribe, set, update } = writable({
+        tasks: [],
+        loading: false,
+        error: null
+    });
 
     async function requireAuth() {
         const auth = getAuth();
@@ -13,9 +17,11 @@ function createTaskStore() {
 
     return {
         subscribe,
-        set,
         setTasks: (tasks) => {
-            update(state => tasks);
+            update(state => ({ ...state, tasks, loading: false }));
+        },
+        set: (tasks) => {
+            update(state => ({ ...state, tasks }));
         },
         addTask: async (taskData) => {
             try {
