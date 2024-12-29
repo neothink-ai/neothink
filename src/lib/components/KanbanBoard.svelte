@@ -3,6 +3,7 @@
   import { taskStore } from '$lib/stores/taskStore';
   import { authStore } from '$lib/stores/authStore';
   import { onMount, createEventDispatcher } from 'svelte';
+  import { fade } from 'svelte/transition'; // Add this import
 
   // Declare props with default values
   export let columns = [
@@ -155,9 +156,15 @@
       return;
     }
     try {
-      await taskStore.addTask(event.detail);
+      const user = $authStore.user;
+      if (!user) throw new Error('Authentication required');
+
+      await taskStore.addTask({
+        title: event.detail.title,
+        columnId: event.detail.columnId,
+        userid: user.uid
+      });
       authError = null;
-      dispatch('addTask', event.detail);
     } catch (err) {
       console.error('Failed to add task:', err);
       authError = err.message;
@@ -171,7 +178,7 @@
   on:dragend={handleDragEnd}
 >
   {#if authError}
-    <div class="auth-error" transition:fade>{authError}</div>
+    <div class="auth-error" transition:fade|local>{authError}</div>
   {/if}
 
   {#if !isAuthenticated}

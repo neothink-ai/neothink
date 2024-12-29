@@ -26,7 +26,7 @@
     if (!title?.trim()) return;
     
     try {
-        await addTask({
+        dispatch('addTask', {
             title,
             columnId: column.id,
             state: column.id,
@@ -37,6 +37,8 @@
             assigned_time: new Date().toISOString(),
             completed_time: null
         });
+        newTaskTitle = '';
+        isAddingTask = false;
     } catch (error) {
         console.error('Failed to add task:', error);
     }

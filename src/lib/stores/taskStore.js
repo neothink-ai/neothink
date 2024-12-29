@@ -14,25 +14,54 @@ function createTaskStore() {
     return {
         subscribe,
         set,
+        setTasks: (tasks) => {
+            update(state => tasks);
+        },
         addTask: async (taskData) => {
             try {
                 const user = await requireAuth();
+                const now = new Date().toISOString();
+                
+                // Ensure all required fields are present with proper types
+                const fullTaskData = {
+                    title: String(taskData.title || ''),
+                    columnId: String(taskData.columnId || 'todo'),
+                    userid: String(user.uid),
+                    state: String(taskData.state || taskData.columnId || 'todo'),
+                    priority: String(taskData.priority || 'Medium'),
+                    size: String(taskData.size || 'Medium'),
+                    description: String(taskData.description || ''),
+                    deadline: taskData.deadline || null,
+                    assignee: taskData.assignee || null,
+                    assigned_time: now,
+                    completed_time: null
+                };
+
                 const response = await fetch('http://localhost:6876/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...taskData,
-                        userid: user.uid
-                    })
+                    body: JSON.stringify(fullTaskData)
                 });
-                
-                if (!response.ok) throw new Error('Failed to add task');
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(typeof errorData.detail === 'string' 
+                        ? errorData.detail 
+                        : 'Failed to add task');
+                }
+
                 const newTask = await response.json();
-                update(tasks => [...tasks, newTask]);
-                return newTask;
+                
+                const processedTask = {
+                    id: newTask._id.$oid,
+                    ...fullTaskData
+                };
+
+                update(tasks => [...tasks, processedTask]);
+                return processedTask;
             } catch (error) {
                 console.error('Failed to add task:', error);
-                throw error;
+                throw new Error(error.message || 'Failed to add task');
             }
         },
         updateTask: async (id, updates) => {

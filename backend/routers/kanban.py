@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from models.tasks import Task
 from database import Database
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 import json
+from typing import Optional
+from datetime import datetime
 
 router = APIRouter(
     prefix="/tasks",
@@ -13,11 +15,14 @@ router = APIRouter(
 db = Database.get_db()
 
 @router.get("")
-async def get_tasks():
+async def get_tasks(userid: Optional[str] = None):
     try:
         tasks_collection = db["Tasks"]["tasks"]
-        cursor = tasks_collection.find()
+        query = {"userid": userid} if userid else {}
+        cursor = tasks_collection.find(query)
         tasks_list = list(cursor)
+        if not tasks_list and userid:
+            return []  # Return empty list instead of 404 for no tasks
         serialized_tasks = json.loads(dumps(tasks_list))
         return serialized_tasks
     except Exception as e:
@@ -27,21 +32,26 @@ async def get_tasks():
 async def create_task(task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
-        task_dict = {
-            "userid": task.userid,
-            "assignee": task.assignee,
-            "deadline": task.deadline,
-            "created_time": task.created_time,
-            "assigned_time": task.assigned_time,
-            "completed_time": task.completed_time,
-            "size": task.size,
-            "priority": task.priority,
-            "columnID": task.columnID
-        }
+        
+        task_dict = task.model_dump(exclude_none=True)
+        # Ensure required timestamps
+        now = datetime.utcnow().isoformat()
+        task_dict.update({
+            "created_time": now,
+            "assigned_time": task_dict.get("assigned_time") or now,
+        })
+        
         result = tasks_collection.insert_one(task_dict)
-        return {"inserted_id": str(result.inserted_id)}
+        
+        return {
+            "_id": {"$oid": str(result.inserted_id)},
+            **task_dict
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=422,
+            detail=str(e)
+        )
 
 @router.put("/{task_id}")
 async def update_task(task_id: str, task: Task):
