@@ -147,6 +147,27 @@
     }
   }
 
+  async function updateTask(event) {
+    const taskData = event.detail;
+    try {
+      const response = await fetch(`http://localhost:6876/tasks/${taskData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(taskData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+
+      await loadTasks(); // Refresh tasks
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
+  }
+
   onMount(async () => {
     if ($authStore.user) {
       await loadTasks();
@@ -211,6 +232,7 @@
         on:moveTask={moveTask}
         on:editTask={(event) => editTask(event.detail.taskId, event.detail.newTitle)}
         on:deleteTask={(event) => deleteTask(event.detail.taskId)}
+        on:updateTask={updateTask}
       />
     {/each}
   {/if}

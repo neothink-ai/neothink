@@ -116,148 +116,131 @@
 
 <style>
   .task {
-    background-color: #fff;
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25);
+    background-color: #ffffff;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.1);
     cursor: grab;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: 
-      background-color 0.2s ease,
-      transform 0.1s ease,
-      box-shadow 0.1s ease;
-    border: 2px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e1e4e8;
     user-select: none;
-    transform-origin: center;
+    min-height: 48px;
+    position: relative;
+    overflow: hidden;
   }
+
   .task:hover {
-    background-color: #f4f5f7;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.15);
+    background-color: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(9, 30, 66, 0.15);
+    border-color: #d0d7de;
   }
+
   .task.is-dragging {
-    opacity: 0.9;
-    transform: scale(1.02);
-    box-shadow: 0 8px 16px rgba(9, 30, 66, 0.25);
-    background: #fff;
+    opacity: 0.95;
+    transform: scale(1.02) rotate(0.5deg);
+    box-shadow: 0 8px 16px rgba(9, 30, 66, 0.3);
+    background: #ffffff;
     cursor: grabbing;
+    border: 1px solid #4c9aff;
   }
-  .task:active {
-    cursor: grabbing;
-    transform: scale(1.02);
-  }
+
   input {
     flex: 1;
     margin-right: 8px;
-    padding: 6px 8px;
+    padding: 8px 12px;
     border: 2px solid #4c9aff;
-    border-radius: 3px;
+    border-radius: 6px;
     font-size: 14px;
     background: white;
-    box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(76, 154, 255, 0.15);
+    transition: all 0.2s ease;
   }
+
   input:focus {
     outline: none;
+    box-shadow: 0 0 0 4px rgba(76, 154, 255, 0.2);
   }
-  button {
-    padding: 4px 8px;
-    background: transparent;
-    border: none;
-    color: #42526e;
-    cursor: pointer;
-    border-radius: 3px;
-    font-size: 12px;
-    transition: all 0.15s ease;
-  }
-  button:hover {
-    color: #FF5630;
-    background: rgba(255, 86, 48, 0.08);
-  }
+
   span {
     font-size: 14px;
-    color: #172b4d;
+    color: #1f2937;
     flex: 1;
-    padding: 2px 4px;
-  }
-
-  .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .modal {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    min-width: 300px;
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-  }
-
-  .form-group input,
-  .form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  .details-button {
-    margin-left: 8px;
-    padding: 4px 8px;
-    background: transparent;
-    border: none;
-    color: #42526e;
-    cursor: pointer;
-    border-radius: 3px;
-  }
-
-  .details-button:hover {
-    background: rgba(9, 30, 66, 0.08);
+    padding: 4px 6px;
+    line-height: 1.4;
+    font-weight: 500;
   }
 
   .task-actions {
     display: flex;
-    gap: 4px;
+    gap: 8px;
     align-items: center;
-    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
 
-  .delete-icon {
-    width: 20px;
-    height: 20px;
+  .task:hover .task-actions {
+    opacity: 1;
+  }
+
+  .details-button {
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    font-weight: 500;
+    font-size: 12px;
+    border-radius: 6px;
     transition: all 0.2s ease;
+  }
+
+  .details-button:hover {
+    background: #e5e7eb;
+    color: #111827;
+    border-color: #9ca3af;
   }
 
   .delete-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 6px;
+    border-radius: 6px;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #ef4444;
+    transition: all 0.2s ease;
+  }
+
+  .delete-button:hover {
+    background: #fecaca;
+    color: #dc2626;
+    transform: scale(1.05);
+  }
+
+  .delete-icon {
+    width: 18px;
+    height: 18px;
+    transition: all 0.2s ease;
+  }
+
+  /* Modal styles enhancement */
+  .modal-backdrop {
+    backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .modal {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    min-width: 400px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 </style>

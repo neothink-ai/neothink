@@ -31,3 +31,8 @@ __pycache__/
 *$py.class
 .pytest_cache/
 *.pyc
+backend/routers/__pycache__
+backend/models/__pycache__
+backend/__pycache__
+backend/models/__pycache__/tasks.cpython-312.pyc
+backend/routers/__pycache__/kanban.cpython-312.pyc
