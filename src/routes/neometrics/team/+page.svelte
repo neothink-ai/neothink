@@ -2,7 +2,8 @@
     import { onMount } from "svelte";
     import { Chart } from "chart.js/auto";
     import ChartDataLabels from "chartjs-plugin-datalabels";
-    import Teamanalytics from "./teamanalytics.svelte";
+    import Teamanalytics from "../teamanalytics.svelte";
+    import { user } from "$lib/backend/authStore";
 
     Chart.register(ChartDataLabels);
 
@@ -27,7 +28,7 @@
     let isTopPerformerCardVisible = false;
     let imageError = false;
     let isAnalyticsPageVisible = false;
-
+    let username = "User"; // Replace with actual username logic
 
     const createChartConfig = (efficiency) => ({
         type: 'doughnut',
@@ -76,33 +77,33 @@
     });
 
     const showGaugeChart = (efficiency) => {
-    if (!efficiency) return;
+        if (!efficiency) return;
 
-    isGaugeVisible = true;
-    isTopPerformerCardVisible = false;
-    isAnalyticsPageVisible = false;
+        isGaugeVisible = true;
+        isTopPerformerCardVisible = false;
+        isAnalyticsPageVisible = false;
 
-    setTimeout(() => {
+        setTimeout(() => {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const ctx = document.getElementById("efficiencyGauge");
+            if (ctx) {
+                chartInstance = new Chart(ctx, createChartConfig(efficiency));
+            }
+        }, 0);
+    };
+
+    const showTopPerformerCard = () => {
+        isTopPerformerCardVisible = true;
+        isGaugeVisible = false;
+        isAnalyticsPageVisible = false;
+
         if (chartInstance) {
             chartInstance.destroy();
         }
-
-        const ctx = document.getElementById("efficiencyGauge");
-        if (ctx) {
-            chartInstance = new Chart(ctx, createChartConfig(efficiency));
-        }
-    }, 0);
-};
-
-const showTopPerformerCard = () => {
-    isTopPerformerCardVisible = true;
-    isGaugeVisible = false;
-    isAnalyticsPageVisible = false;
-
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-};
+    };
 
     const handleImageError = () => {
         imageError = true;
@@ -110,15 +111,14 @@ const showTopPerformerCard = () => {
     };
 
     const showAnalyticsPage = () => {
-    isAnalyticsPageVisible = true;
-    isGaugeVisible = false;
-    isTopPerformerCardVisible = false;
+        isAnalyticsPageVisible = true;
+        isGaugeVisible = false;
+        isTopPerformerCardVisible = false;
 
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-};
-
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+    };
 
     onMount(async () => {
         try {
@@ -140,6 +140,29 @@ const showTopPerformerCard = () => {
 </script>
 
 <style>
+    .logo {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        width: 200px;
+        height: auto;
+    }
+
+    .welcome-message {
+        text-align: left;
+        margin-left: 80px;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .welcome-message .welcome {
+        color: #00bf63;
+    }
+
+    .welcome-message .username {
+        color: black;
+    }
+
     .metrics-container {
         display: flex;
         flex-wrap: wrap;
@@ -156,7 +179,7 @@ const showTopPerformerCard = () => {
         width: 150px;
         height: 120px;
         margin: 8px;
-        margin-top: 80px;
+        margin-top: 20px;
         border-radius: 12px;
         box-shadow: 0px 4px 10px rgba(0, 191, 99, 0.5);
         background-color: white;
@@ -287,6 +310,14 @@ const showTopPerformerCard = () => {
     }
 </style>
 
+<div>
+    <img src="/assets/neometrics1.png" alt="Logo" class="logo" />
+</div>
+
+<div class="welcome-message">
+    <span class="welcome">Welcome,</span> <span class="username">{$user.displayName}!</span>
+</div>
+
 <div class="metrics-container">
     <div class="metric-box" on:click={showAnalyticsPage}>
         <div class="metric-title">Team Analytics</div>
@@ -354,4 +385,3 @@ const showTopPerformerCard = () => {
 {#if isAnalyticsPageVisible}
     <Teamanalytics />
 {/if}
-
