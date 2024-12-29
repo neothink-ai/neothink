@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { Chart } from "chart.js/auto";
     import ChartDataLabels from "chartjs-plugin-datalabels";
+    import Teamanalytics from "./teamanalytics.svelte";
 
     Chart.register(ChartDataLabels);
 
@@ -25,6 +26,8 @@
     let isGaugeVisible = false;
     let isTopPerformerCardVisible = false;
     let imageError = false;
+    let isAnalyticsPageVisible = false;
+
 
     const createChartConfig = (efficiency) => ({
         type: 'doughnut',
@@ -73,35 +76,49 @@
     });
 
     const showGaugeChart = (efficiency) => {
-        if (!efficiency) return;
-        
-        isGaugeVisible = true;
-        isTopPerformerCardVisible = false;
-        
-        setTimeout(() => {
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+    if (!efficiency) return;
 
-            const ctx = document.getElementById("efficiencyGauge");
-            if (ctx) {
-                chartInstance = new Chart(ctx, createChartConfig(efficiency));
-            }
-        }, 0);
-    };
+    isGaugeVisible = true;
+    isTopPerformerCardVisible = false;
+    isAnalyticsPageVisible = false;
 
-    const showTopPerformerCard = () => {
-        isTopPerformerCardVisible = true;
-        isGaugeVisible = false;
+    setTimeout(() => {
         if (chartInstance) {
             chartInstance.destroy();
         }
-    };
+
+        const ctx = document.getElementById("efficiencyGauge");
+        if (ctx) {
+            chartInstance = new Chart(ctx, createChartConfig(efficiency));
+        }
+    }, 0);
+};
+
+const showTopPerformerCard = () => {
+    isTopPerformerCardVisible = true;
+    isGaugeVisible = false;
+    isAnalyticsPageVisible = false;
+
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+};
 
     const handleImageError = () => {
         imageError = true;
         console.error('Image failed to load. Using fallback avatar.');
     };
+
+    const showAnalyticsPage = () => {
+    isAnalyticsPageVisible = true;
+    isGaugeVisible = false;
+    isTopPerformerCardVisible = false;
+
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+};
+
 
     onMount(async () => {
         try {
@@ -271,6 +288,11 @@
 </style>
 
 <div class="metrics-container">
+    <div class="metric-box" on:click={showAnalyticsPage}>
+        <div class="metric-title">Team Analytics</div>
+        <div class="metric-value">View</div>
+    </div>
+    
     <div class="metric-box" on:click={() => showGaugeChart(teamData.performanceSummary?.overallEfficiency)}>
         <div class="metric-title">Overall Efficiency</div>
         <div class="metric-value">{teamData.performanceSummary?.overallEfficiency ?? "Loading..."}%</div>
@@ -328,3 +350,8 @@
         </div>
     </div>
 {/if}
+
+{#if isAnalyticsPageVisible}
+    <Teamanalytics />
+{/if}
+
