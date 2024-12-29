@@ -89,7 +89,6 @@
   {:else}
     <span on:dblclick|stopPropagation={() => isEditing = true}>{task.title}</span>
     <div class="task-actions">
-      <button class="details-button" on:click={() => showModal = true}>Details</button>
       <button 
         class="delete-button"
         on:click={handleDelete}
@@ -177,7 +176,6 @@
 
   .task-actions {
     display: flex;
-    gap: 8px;
     align-items: center;
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -185,23 +183,6 @@
 
   .task:hover .task-actions {
     opacity: 1;
-  }
-
-  .details-button {
-    padding: 6px 12px;
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
-    color: #374151;
-    font-weight: 500;
-    font-size: 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-  }
-
-  .details-button:hover {
-    background: #e5e7eb;
-    color: #111827;
-    border-color: #9ca3af;
   }
 
   .delete-button {
