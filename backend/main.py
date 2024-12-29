@@ -7,7 +7,7 @@ from database import Database
 from bson.json_util import dumps
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-from routers.tasks_endpoints import router as tasks_router
+from routers.kanban import router as tasks_router  # Changed from tasks_endpoints to kanban
 
 app = FastAPI()
 app.add_middleware(

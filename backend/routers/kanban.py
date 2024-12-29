@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from models.tasks import Task
 from database import Database
 from bson.objectid import ObjectId
