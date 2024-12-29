@@ -1,15 +1,16 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Optional
+from bson import ObjectId
 from datetime import datetime
 
 class Task(BaseModel):
-    title: str = Field(..., min_length=1, description="Task title")
-    columnId: str = Field(..., min_length=1, description="Column identifier")
-    userid: str = Field(..., min_length=1, description="User identifier")
-    state: Optional[str] = None
-    priority: str = Field(default="Medium")
-    size: str = Field(default="Medium")
-    description: str = Field(default="")
+    title: str
+    columnId: str
+    userid: str
+    state: str
+    priority: str = "Medium"
+    size: str = "Medium"
+    description: Optional[str] = ""
     deadline: Optional[str] = None
     assignee: Optional[str] = None
     assigned_time: Optional[str] = None
@@ -18,33 +19,18 @@ class Task(BaseModel):
 
     @model_validator(mode='before')
     @classmethod
-    def set_defaults(cls, values):
+    def handle_objectid(cls, values):
         if isinstance(values, dict):
-            values['state'] = values.get('state') or values.get('columnId', 'todo')
-            values['description'] = values.get('description', '')
-            values['priority'] = values.get('priority', 'Medium')
-            values['size'] = values.get('size', 'Medium')
-            # Convert empty strings to None
-            for key in values:
-                if values[key] == "":
-                    values[key] = None
+            # Handle _id field if present
+            if '_id' in values:
+                if isinstance(values['_id'], dict) and '$oid' in values['_id']:
+                    values['_id'] = values['_id']['$oid']
+                elif isinstance(values['_id'], ObjectId):
+                    values['_id'] = str(values['_id'])
         return values
 
-    model_config = {
-        "json_schema_extra": {
-            "example": {
-                "title": "Example Task",
-                "columnId": "todo",
-                "userid": "user123",
-                "state": "todo",
-                "priority": "Medium",
-                "size": "Medium",
-                "description": "",
-                "deadline": None,
-                "assignee": None,
-                "assigned_time": None,
-                "completed_time": None,
-                "created_time": None
-            }
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            ObjectId: str  # Convert ObjectId to string when serializing
         }
-    }

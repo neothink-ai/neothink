@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
+from fastapi.responses import JSONResponse
 from models.tasks import Task
 from database import Database
 from bson.objectid import ObjectId
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 import json
 from typing import Optional
 from datetime import datetime
@@ -13,6 +14,17 @@ router = APIRouter(
 )
 
 db = Database.get_db()
+
+@router.options("")
+async def options_handler():
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, GET, DELETE, PUT, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+        }
+    )
 
 @router.get("")
 async def get_tasks(userid: Optional[str] = None):
@@ -33,24 +45,24 @@ async def create_task(task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
         
-        task_dict = task.model_dump(exclude_none=True)
-        # Ensure required timestamps
-        now = datetime.utcnow().isoformat()
-        task_dict.update({
-            "created_time": now,
-            "assigned_time": task_dict.get("assigned_time") or now,
-        })
+        # Convert the task to a dict and remove None values
+        task_dict = {k: v for k, v in task.model_dump().items() if v is not None}
         
+        # Insert the task
         result = tasks_collection.insert_one(task_dict)
         
-        return {
-            "_id": {"$oid": str(result.inserted_id)},
-            **task_dict
-        }
+        # Create response data
+        response_data = task_dict.copy()
+        response_data["_id"] = str(result.inserted_id)
+        
+        # Return a JSONResponse directly
+        return JSONResponse(content=response_data)
+        
     except Exception as e:
+        print(f"Error creating task: {str(e)}")  # Debug log
         raise HTTPException(
             status_code=422,
-            detail=str(e)
+            detail=f"Error creating task: {str(e)}"
         )
 
 @router.put("/{task_id}")

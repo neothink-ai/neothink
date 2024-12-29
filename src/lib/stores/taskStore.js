@@ -39,7 +39,12 @@ function createTaskStore() {
 
                 const response = await fetch('http://localhost:6876/tasks', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors', // Add this
+                    credentials: 'omit', // Change from 'include' to 'omit'
                     body: JSON.stringify(fullTaskData)
                 });
 

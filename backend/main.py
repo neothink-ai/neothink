@@ -10,12 +10,16 @@ from datetime import datetime
 from routers.kanban import router as tasks_router  # Changed from tasks_endpoints to kanban
 
 app = FastAPI()
+
+# Update CORS middleware with more specific configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5174", "http://localhost:5173"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*", "Content-Type", "Authorization"],
+    expose_headers=["*"],
+    max_age=600,
 )
 
 # Remove the direct client connection and use Database class instead
