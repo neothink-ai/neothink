@@ -1,21 +1,31 @@
 <script>
   import Column from '$lib/components/Column.svelte';
   import { taskStore } from '$lib/stores/taskStore';
-  import { onMount } from 'svelte';
+  import { authStore } from '$lib/stores/authStore';
+  import { onMount, createEventDispatcher } from 'svelte';
 
+  // Declare props with default values
   export let columns = [
     { id: 'todo', title: 'To Do' },
     { id: 'inProgress', title: 'In Progress' },
     { id: 'done', title: 'Done' }
   ];
 
-  let tasks = [];  // Initialize empty tasks array
-  let isDragging = false;
+  let tasks = [];
+  let loading = false;
+  let error = null;
+  let authError = null;
 
-  // Subscribe to the store
-  taskStore.subscribe(value => {
-    tasks = value;
+  const dispatch = createEventDispatcher();
+
+  // Subscribe to taskStore
+  taskStore.subscribe(state => {
+    tasks = state.tasks || [];
+    loading = state.loading;
+    error = state.error;
   });
+
+  let isDragging = false;
 
   function handleDragStart() {
     isDragging = true;
@@ -25,36 +35,12 @@
     isDragging = false;
   }
 
-  async function addTask(title, columnId) {
+  // Task operations
+  async function addTask(event) {
     try {
-      const taskData = {
-        title,
-        columnId,
-        state: columnId,
-        priority: 'Medium',
-        size: 'Medium',
-        deadline: null,
-        assignee: null,
-        assigned_time: new Date().toISOString(),
-        completed_time: null
-      };
-
-      console.log('Sending task data:', taskData); // Debug log
-
-      const response = await fetch('http://localhost:6876/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      await loadTasks();
-    } catch (error) {
-      console.error('Failed to add task:', error);
+      await taskStore.addTask(event.detail);
+    } catch (err) {
+      console.error('Failed to add task:', err);
     }
   }
 
@@ -150,9 +136,33 @@
     }
   }
 
-  onMount(() => {
-    loadTasks();
+  onMount(async () => {
+    try {
+      const response = await fetch('http://localhost:6876/tasks');
+      if (!response.ok) throw new Error('Failed to fetch tasks');
+      const data = await response.json();
+      taskStore.setTasks(data);
+    } catch (err) {
+      console.error('Failed to load tasks:', err);
+    }
   });
+
+  $: isAuthenticated = $authStore.user !== null;
+
+  async function handleAddTask(event) {
+    if (!isAuthenticated) {
+      authError = 'Please sign in to add tasks';
+      return;
+    }
+    try {
+      await taskStore.addTask(event.detail);
+      authError = null;
+      dispatch('addTask', event.detail);
+    } catch (err) {
+      console.error('Failed to add task:', err);
+      authError = err.message;
+    }
+  }
 </script>
 
 <div 
@@ -160,16 +170,34 @@
   on:dragstart={handleDragStart} 
   on:dragend={handleDragEnd}
 >
-  {#each columns as column}
-    <Column
-      {column}
-      tasks={tasks.filter(task => task.columnId === column.id)}
-      on:addTask={(event) => addTask(event.detail.title, column.id)}
-      on:moveTask={moveTask}
-      on:editTask={(event) => editTask(event.detail.taskId, event.detail.newTitle)}
-      on:deleteTask={(event) => deleteTask(event.detail.taskId)}
-    />
-  {/each}
+  {#if authError}
+    <div class="auth-error" transition:fade>{authError}</div>
+  {/if}
+
+  {#if !isAuthenticated}
+    <div class="auth-warning">
+      Please sign in to manage tasks
+    </div>
+  {/if}
+
+  {#if error}
+    <div class="error-message">{error}</div>
+  {/if}
+
+  {#if loading}
+    <div class="loading">Loading tasks...</div>
+  {:else}
+    {#each columns as column (column.id)}
+      <Column
+        {column}
+        tasks={tasks.filter(task => task?.columnId === column.id) || []}
+        on:addTask={handleAddTask}
+        on:moveTask={moveTask}
+        on:editTask={(event) => editTask(event.detail.taskId, event.detail.newTitle)}
+        on:deleteTask={(event) => deleteTask(event.detail.taskId)}
+      />
+    {/each}
+  {/if}
 </div>
 
 <style>
@@ -185,5 +213,26 @@
   }
   .kanban-board.dragging {
     background-color: #ebecf0;
+  }
+
+  .auth-error {
+    background: #ffebe6;
+    color: #de350b;
+    padding: 8px 16px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+  }
+
+  .auth-warning {
+    background: #fffae6;
+    color: #172b4d;
+    padding: 8px 16px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    text-align: center;
   }
 </style>

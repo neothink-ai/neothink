@@ -1,7 +1,10 @@
 <script>
   import KanbanBoard from '$lib/components/KanbanBoard.svelte';
   import { onMount } from 'svelte';
-  import { getAuth } from 'firebase/auth'; // Import Firebase auth
+  import { getAuth } from 'firebase/auth';
+  import { taskStore } from '$lib/stores/taskStore';
+  import { authStore } from '$lib/stores/authStore';
+  import { goto } from '$app/navigation';
 
   let columns = [
     { id: 'todo', title: 'To Do' },
@@ -10,6 +13,11 @@
   ];
 
   let tasks = [];
+
+  // Subscribe to taskStore
+  taskStore.subscribe(value => {
+    tasks = value;
+  });
 
   async function fetchTasks(userid) {
     try {
@@ -24,14 +32,39 @@
     }
   }
 
-  onMount(async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      await fetchTasks(user.uid);
-    } else {
-      console.error('User not logged in');
+  // Task event handlers
+  async function handleAddTask(event) {
+    const { title, columnId } = event.detail;
+    try {
+      await taskStore.addTask({
+        title,
+        columnId,
+        state: columnId,
+        priority: 'Medium',
+        size: 'Medium',
+        deadline: null,
+        assignee: null,
+        assigned_time: new Date().toISOString(),
+        completed_time: null
+      });
+    } catch (error) {
+      console.error('Failed to add task:', error);
     }
+  }
+
+  async function handleMoveTask(event) {
+    // Pass to KanbanBoard component
+  }
+
+  onMount(async () => {
+    if ($authStore.loading) return;
+    
+    if (!$authStore.user) {
+      goto('/login?redirect=/kanban');
+      return;
+    }
+
+    await fetchTasks($authStore.user.uid);
   });
 </script>
 
@@ -43,7 +76,12 @@
       class="logo"
     />
   </div>
-  <KanbanBoard {columns} {tasks} on:addTask={addTask} on:moveTask={moveTask} />
+  <KanbanBoard 
+    {columns} 
+    {tasks} 
+    on:addTask={handleAddTask} 
+    on:moveTask={handleMoveTask} 
+  />
 </div>
 
 <style>

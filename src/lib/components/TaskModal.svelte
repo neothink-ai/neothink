@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { taskStore } from '$lib/stores/taskStore';
+  import { updateTask } from '$lib/stores/taskStore';
   import { fade } from 'svelte/transition';
   
   export let task;
@@ -38,9 +38,8 @@
         columnId: task.columnId // Ensure columnId is included
       };
 
-      const updatedTask = taskStore.updateTask(task.id, updates);
-      dispatch('taskUpdated', updatedTask);
-      close();
+      await updateTask(task.id, updates);
+      dispatch('close');
     } catch (err) {
       error = err.message;
       console.error('Error updating task:', err);

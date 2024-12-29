@@ -2,9 +2,9 @@
   import Task from '$lib/components/Task.svelte';
   import { createEventDispatcher, onDestroy } from 'svelte';
   import { slide } from 'svelte/transition';
-  
+  import { addTask } from '$lib/stores/taskStore';
 
-  export let column;
+  export let column = { id: '', title: '' };
   export let tasks = [];
 
   const dispatch = createEventDispatcher();
@@ -17,15 +17,28 @@
   let inputTimeout;
   let isDropTarget = false;
 
-  $: columnTasks = tasks;
+  $: columnTasks = tasks || [];
   $: taskCount = columnTasks.length;
 
   console.log(`Column ${column.id} tasks:`, columnTasks); // Debug log
 
-  function handleAddTask() {
-    if (newTaskTitle.trim()) {
-      dispatch('addTask', { title: newTaskTitle, columnId: column.id });
-      newTaskTitle = '';
+  async function handleAddTask(title) {
+    if (!title?.trim()) return;
+    
+    try {
+        await addTask({
+            title,
+            columnId: column.id,
+            state: column.id,
+            priority: 'Medium',
+            size: 'Medium',
+            deadline: null,
+            assignee: null,
+            assigned_time: new Date().toISOString(),
+            completed_time: null
+        });
+    } catch (error) {
+        console.error('Failed to add task:', error);
     }
   }
 
@@ -107,7 +120,8 @@
   on:drop={handleDrop}
   on:dragover={handleDragOver}
   on:dragleave={handleDragLeave}
-  role="list"
+  role="region"
+  aria-label={column.title}
 >
   <div class="column-header">
     <div class="header-title">
@@ -133,7 +147,7 @@
           bind:value={newTaskTitle}
           on:keyup="{e => {
             if (e.key === 'Enter') {
-              handleAddTask();
+              handleAddTask(newTaskTitle);
             }
             startInputTimeout();
           }}"
@@ -142,7 +156,7 @@
           autofocus
         />
         <div class="new-task-actions">
-          <button on:click={handleAddTask}>Add</button>
+          <button on:click={() => handleAddTask(newTaskTitle)}>Add</button>
           <button 
             class="cancel-button" 
             on:click={() => {
@@ -153,18 +167,12 @@
         </div>
       </li>
     {/if}
-    {#each columnTasks as task (task.id)}
-      {#if dragOverIndex === columnTasks.indexOf(task)}
-        <div class="drop-indicator" />
-      {/if}
-      <Task
-        {task}
-        onEditTask={handleEditTask}
-        onDeleteTask={handleDeleteTask}
-      />
-    {/each}
-    {#if dragOverIndex === columnTasks.length}
-      <div class="drop-indicator" />
+    {#if columnTasks.length > 0}
+      {#each columnTasks as task (task.id)}
+        <Task {task} on:editTask on:deleteTask />
+      {/each}
+    {:else}
+      <li class="empty-column">No tasks yet</li>
     {/if}
   </ul>
   
