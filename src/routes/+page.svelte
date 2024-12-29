@@ -70,32 +70,32 @@
 			<img src="/assets/neothink.png" alt="Logo" />
 		</div>
 		<nav class="header-nav">
-			<a href="#">Product</a>
-			<a href="/sign-up">Sign Up</a>
-			<a href="/login">Log In</a>
+			<a href="#">Explore</a>
+			<a href="/home">Dashboard</a>
 			<a href="#">Team</a>
+			<a href="/login">Log In</a>
 		</nav>
 	</header>
 
 	<!-- Hero Section -->
 	<main class="main-container">
-		<h1>Smarter Workflows, Smarter Teams</h1>
+		<h1><strong>Smarter Workflows, Smarter Teams</strong></h1>
 		<p>Plan. Optimize. Achieve. Powered by the brilliance of AI.</p>
 
 		<div class="main-content">
 			<div id="animate" class="animation-container" bind:this={animationContainer}></div>
 			<div class="buttons-container">
-				<a href="/sign-up"><button class="button primary">Sign Up</button></a>
-				<button class="button secondary">Learn More</button>
+				<a href="/sign-up"><button class="button signup-button">Sign Up</button></a>
+				<button class="button learnmore-button">Learn More</button>
 			</div>
 		</div>
 	</main>
 
 	<!-- Key Features Section -->
 	<section class="key-features">
-		<h2>Explore Neothink's Core Features</h2>
+		<h2 style="font-family: 'Open Sans', sans-serif; font-weight: bold;">Explore Neothink's Core Features</h2>
 		<div class="feature-cards">
-			<div class="key-feature-card">
+			<div class="key-feature-card" style="width: 300px;">
 				<div class="card-header">
 					<img src="/assets/neotaskmaster.png" alt="Neotaskmaster" />
 				</div>
@@ -107,7 +107,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="key-feature-card">
+			<div class="key-feature-card" style="width: 300px;">
 				<div class="card-header">
 					<img src="/assets/neometrics.png" alt="Neometrics" />
 				</div>
@@ -119,7 +119,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="key-feature-card">
+			<div class="key-feature-card" style="width: 300px;">
 				<div class="card-header">
 					<img src="/assets/neoplan.png" alt="Neoplan" />
 				</div>
@@ -139,7 +139,7 @@
 		<div class="feature-cards">
 			{#each features as feature}
 				<div class="feature-card">
-					<img src={feature.icon} alt={feature.title} class="feature-icon" />
+					<img src={feature.icon} alt={feature.title} class="feature-icon" style="display: block; margin: 0 auto;" />
 					<h3>{feature.title}</h3>
 					<p>{feature.description}</p>
 				</div>
@@ -165,7 +165,7 @@
 	/* General Styling */
 	:global(body) {
 		margin: 0;
-		font-family: Arial, sans-serif;
+		font-family: 'Open Sans', 'Roboto', sans-serif;
 		background-color: #ffffff;
 	}
 
@@ -243,18 +243,25 @@
 		border-radius: 8px;
 	}
 
-	.button.primary {
-		background-color: #0052cc;
-		color: white;
-		box-shadow: 0 4px 8px rgba(0, 82, 204, 0.4);
+	.signup-button,
+	.learnmore-button {
+		font-weight: bold;;
+		font-family: 'Open Sans', sans-serif;
+		width: 140px; /* Ensure both buttons have the same width */
 	}
 
-	.button.secondary {
-		background-color: #f0f0f0;
-		color: black;
-		border: 2px solid #0052cc;
-		box-shadow: 0 4px 8px rgba(0, 82, 204, 0.1);
+	.signup-button {
+		background-color: #7743e0;
+		color: white;
+		box-shadow: 0 4px 8px rgba(75, 0, 204, 0.4);
 	}
+
+	.learnmore-button {
+		font-size:small;
+		color: black;
+		border: 2px solid #884ac7;
+	}
+
 
 	/* Key Features Section */
 	.key-features {

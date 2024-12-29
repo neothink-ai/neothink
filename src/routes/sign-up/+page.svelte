@@ -30,9 +30,6 @@
 	}
   </script>
   
-  <!-- Full Background Container -->
-  <div class="full-background"></div>
-  
   <!-- Loader Section -->
   <div id="loader" class="loader">
 	<div class="spinner"></div>
@@ -41,9 +38,9 @@
   <!-- Main Container (Sign Up Form) -->
   <div class="container">
 	<div class="header">
-	  <img src="assets/neothink.png" alt="Logo" class="logo" />
+	  <img src="assets/neothink.png" alt="Logo" class="logo" style="display: block; margin: 0 auto;" />
 	</div>
-	<h2>Create Account</h2>
+	<h2 style="font-family: 'Open Sans', sans-serif;">Create Account</h2>
 	<form on:submit|preventDefault={handleSignup}>
 	  <label for="email">Email</label>
 	  <input type="email" id="email" name="email" bind:value={email} required />
@@ -88,24 +85,10 @@
   
   <!-- Styles for Home.svelte -->
   <style>
-	/* Full Background with Transparency */
-	.full-background {
-	  position: absolute;
-	  top: 0;
-	  bottom: 40%;
-	  left: 20%;
-	  width: 100%;
-	  height: 100%;
-	  background-image: url("assets/feature1.png");
-	  background-size: cover;
-	  background-position: center;
-	  opacity: 0.5; /* Adjust transparency here (0 is fully transparent, 1 is fully opaque) */
-	  z-index: -1; /* Ensures the background stays behind other content */
-	}
   
 	/* General Body Styles */
 	body {
-	  font-family: Arial, sans-serif;
+	font-family: 'Open Sans', sans-serif;
 	  background-color: #f4f4f4;
 	  margin: 0;
 	  padding: 0;
@@ -155,7 +138,7 @@
   
 	/* Container Style - Shifted Left and Moved Down (touching the top) */
 	.container {
-	  max-width: 350px; /* Smaller width */
+	  max-width: 400px; /* Smaller width */
 	  margin-top: 1%; /* Moves the container to the top */
 	  margin-left: 5%; /* Shifted towards the left */
 	  background-color: #fff;
@@ -214,7 +197,7 @@
 	  padding: 12px;
 	  font-size: 16px;
 	  color: #fff;
-	  background-color: #8b61c2;
+	  background-color: #7743e0;
 	  border: none;
 	  border-radius: 8px;
 	  cursor: pointer;
@@ -222,7 +205,7 @@
 	}
   
 	button:hover {
-	  background-color: #7a4fa2;
+	  background-color: #5513d8;
 	}
   
 	/* OAuth Buttons Style */

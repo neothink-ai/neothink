@@ -36,7 +36,7 @@ export async function signIn(email, password) {
 export async function logOut() {
   try {
     await signOut(auth);
-    goto('/landing-page');
+    goto('/');
   } catch (error) {
     throw new Error(error.message);
   }
