@@ -1,9 +1,9 @@
 {
     "team": "Tech Titans",
-    "teamLeader": "Shrukie",
+    "teamLeader": "Shivam Shah",
     "members": [
       {
-        "name": "Shrukie",
+        "name": "Shivam Shah",
         "performanceSummary": {
           "overallEfficiency": 85.0,
           "tasksCompleted": 35,
@@ -29,7 +29,7 @@
         }
       },
       {
-        "name": "Chirasya",
+        "name": "Chinmayi Madhav",
         "performanceSummary": {
           "overallEfficiency": 80.0,
           "tasksCompleted": 30,
@@ -55,7 +55,7 @@
         }
       },
       {
-        "name": "Hema",
+        "name": "Hari Sharma",
         "performanceSummary": {
           "overallEfficiency": 92.0,
           "tasksCompleted": 45,
@@ -81,7 +81,7 @@
         }
       },
       {
-        "name": "Raghav",
+        "name": "Raghav Mehta",
         "performanceSummary": {
           "overallEfficiency": 75.0,
           "tasksCompleted": 15,
@@ -112,7 +112,7 @@
       "tasksCompleted": 125,
       "currentWorkload": 20,
       "topPerformer": {
-        "name": "Hema",
+        "name": "Hari Sharma",
         "metrics": {
           "tasksCompleted": 45,
           "efficiency": 92.0

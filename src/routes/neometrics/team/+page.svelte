@@ -314,9 +314,9 @@
     <img src="/assets/neometrics1.png" alt="Logo" class="logo" />
 </div>
 
-<div class="welcome-message">
+<!-- <div class="welcome-message">
     <span class="welcome">Welcome,</span> <span class="username">{$user.displayName}!</span>
-</div>
+ </div> -->
 
 <div class="metrics-container">
     <div class="metric-box" on:click={showAnalyticsPage}>
