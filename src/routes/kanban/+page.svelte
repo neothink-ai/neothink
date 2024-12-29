@@ -68,7 +68,7 @@
   });
 </script>
 
-<div class="kanban-container">
+<div class="kanban-page">
   <div class="logo-container">
     <img 
       src="src\lib\assets\neotaskmaster-logo.png" 
@@ -76,15 +76,18 @@
       class="logo"
     />
   </div>
-  <KanbanBoard 
-    {columns} 
-    {tasks} 
-    on:addTask={handleAddTask} 
-    on:moveTask={handleMoveTask} 
-  />
+  <KanbanBoard />
 </div>
 
 <style>
+  .kanban-page {
+    height: calc(100vh - 64px); /* Account for TopBar height */
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding-left: 1rem; /* Add some padding from the sidebar */
+  }
+
   .kanban-container {
     height: 100vh;
     display: flex;

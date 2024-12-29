@@ -3,8 +3,8 @@
   import TaskModal from './TaskModal.svelte';
   
   export let task;
-  export let onEditTask;
-  export let onDeleteTask;
+  export let onEditTask = () => {};  // Default no-op function
+  export let onDeleteTask = () => {};  // Default no-op function
 
   const dispatch = createEventDispatcher();
   let isEditing = false;
@@ -24,10 +24,15 @@
       id: task.id,
       title: task.title,
       columnId: task.columnId,
+      userid: task.userid,
+      state: task.state,
       priority: task.priority,
       size: task.size,
+      description: task.description,
       deadline: task.deadline,
-      assignee: task.assignee
+      assignee: task.assignee,
+      assigned_time: task.assigned_time,
+      completed_time: task.completed_time
     };
     
     event.dataTransfer.setData('application/json', JSON.stringify(taskData));
@@ -40,7 +45,7 @@
   }
 
   function saveEdit() {
-    if (editedTitle.trim()) {
+    if (editedTitle.trim() && onEditTask) {
       onEditTask(task.id, editedTitle);
       isEditing = false;
     }
@@ -53,7 +58,9 @@
 
   function handleDelete(event) {
     event.stopPropagation(); // Prevent event bubbling
-    onDeleteTask(task.id);
+    if (onDeleteTask) {
+      onDeleteTask(task.id);
+    }
   }
 </script>
 

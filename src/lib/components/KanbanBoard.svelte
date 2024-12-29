@@ -12,7 +12,7 @@
     { id: 'done', title: 'Done' }
   ];
 
-  let tasks = [];
+  let tasks = [];  // Local state, not a prop
   let loading = false;
   let error = null;
   let authError = null;
@@ -51,22 +51,28 @@
     try {
       // Optimistically update UI
       tasks = tasks.map(t => 
-        t.id === taskId ? { ...t, columnId: newColumnId } : t
+        t.id === taskId ? { ...t, columnId: newColumnId, state: newColumnId } : t
       );
+
+      const updateData = {
+        ...taskData,
+        columnId: newColumnId,
+        state: newColumnId
+      };
 
       const response = await fetch(`http://localhost:6876/tasks/${taskId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...taskData,
-          columnId: newColumnId
-        })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(updateData)
       });
 
       if (!response.ok) {
         // Revert on failure
         tasks = tasks.map(t => 
-          t.id === taskId ? { ...t, columnId: taskData.columnId } : t
+          t.id === taskId ? { ...t, columnId: taskData.columnId, state: taskData.state } : t
         );
         throw new Error(`Failed to update task: ${response.statusText}`);
       }
@@ -216,10 +222,11 @@
     gap: 12px;
     padding: 24px;
     overflow-x: auto;
-    height: calc(100vh - 48px);
+    height: 100%; /* Changed from calc(100vh - 48px) */
     background-color: #f4f5f7;
     transition: background-color 0.2s ease;
     align-items: flex-start;
+    width: 100%;
   }
   .kanban-board.dragging {
     background-color: #ebecf0;

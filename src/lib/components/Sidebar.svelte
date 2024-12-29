@@ -50,17 +50,18 @@
     position: fixed;
     left: 0;
     top: 64px; /* Adjust to match the height of the topbar */
-    height: calc(100% - 64px); /* Adjust to match the height of the topbar */
+    height: calc(100vh - 64px); /* Adjust to match the height of the topbar */
     width: 80px;
     background-color: #f3f4f6;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    transition: width 0.3s;
-    z-index: 1000;
+    transition: all 0.2s ease-in-out; /* Smoother transition */
+    z-index: 40; /* Lower z-index to prevent overlap with content */
+    will-change: width; /* Optimize transition performance */
   }
 
   .sidebar.open {
-    width: 25vh;
+    width: 250px; /* Fixed width when open */
   }
 
   .menu-item {
@@ -110,15 +111,15 @@
   }
   .overlay {
     position: fixed;
-    top: 0;
+    top: 64px; /* Align with sidebar */
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 64px);
     background: rgba(0, 0, 0, 0.5);
-    transition: opacity 0.3s;
+    transition: opacity 0.2s ease-in-out;
     opacity: 0;
     pointer-events: none;
-    z-index: 999;
+    z-index: 39; /* Below sidebar */
   }
 
   .overlay.open {

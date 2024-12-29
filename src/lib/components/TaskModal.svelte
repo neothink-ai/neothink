@@ -5,7 +5,7 @@
   
   export let task;
   export let show = false;
-  export let onAddTask;
+  export let onAddTask = () => {};  // Make it optional with a default no-op function
   let title = '';
   let columnId = 'todo';
 
@@ -49,8 +49,10 @@
   }
 
   function handleSubmit() {
-    onAddTask(title, columnId);
-    title = '';
+    if (onAddTask) {  // Check if onAddTask exists before calling
+      onAddTask(title, columnId);
+      title = '';
+    }
   }
 </script>
 

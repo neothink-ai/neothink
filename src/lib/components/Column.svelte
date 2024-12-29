@@ -4,8 +4,9 @@
   import { slide } from 'svelte/transition';
   import { addTask } from '$lib/stores/taskStore';
 
-  export let column = { id: '', title: '' };
-  export let tasks = [];
+  // Define required props
+  export let column;
+  export let tasks = [];  // Provide default empty array
 
   const dispatch = createEventDispatcher();
   let newTaskTitle = '';
@@ -17,7 +18,7 @@
   let inputTimeout;
   let isDropTarget = false;
 
-  $: columnTasks = tasks || [];
+  $: columnTasks = tasks || [];  // Ensure we always have an array
   $: taskCount = columnTasks.length;
 
   console.log(`Column ${column.id} tasks:`, columnTasks); // Debug log
@@ -77,10 +78,7 @@
   }
 
   function handleDeleteTask(taskId) {
-    const taskToDelete = tasks.find(t => t.columnId === column.id && t.id === taskId);
-    if (taskToDelete) {
-      dispatch('deleteTask', { taskId });
-    }
+    dispatch('deleteTask', { taskId });
   }
 
   function handleAddTaskFromBottom() {
@@ -171,7 +169,11 @@
     {/if}
     {#if columnTasks.length > 0}
       {#each columnTasks as task (task.id)}
-        <Task {task} on:editTask on:deleteTask />
+        <Task 
+          {task} 
+          onEditTask={handleEditTask}
+          onDeleteTask={handleDeleteTask}
+        />
       {/each}
     {:else}
       <li class="empty-column">No tasks yet</li>

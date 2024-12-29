@@ -75,24 +75,26 @@ async def update_task(task_id: str, task: Task):
     try:
         tasks_collection = db["Tasks"]["tasks"]
         obj_id = ObjectId(task_id)
-        update_data = {
-            "userid": task.userid,
-            "assignee": task.assignee,
-            "deadline": task.deadline,
-            "assigned_time": task.assigned_time,
-            "completed_time": task.completed_time,
-            "size": task.size,
-            "priority": task.priority,
-            "columnID": task.columnID
-        }
+        
+        # Use the incoming task data directly
+        update_data = {k: v for k, v in task.model_dump().items() if v is not None}
+        
         result = tasks_collection.update_one(
             {"_id": obj_id}, 
             {"$set": update_data}
         )
+        
         if result.modified_count == 0:
             raise HTTPException(status_code=404, detail="Task not found")
-        return {"status": "success", "columnID": task.columnID}
+            
+        # Return updated task data
+        return JSONResponse(content={
+            "status": "success",
+            "columnId": task.columnId,
+            "task": update_data
+        })
     except Exception as e:
+        print(f"Update task error: {str(e)}")  # Add debug logging
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/{task_id}")
