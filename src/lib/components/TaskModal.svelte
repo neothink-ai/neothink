@@ -3,23 +3,30 @@
   import { updateTask } from '$lib/stores/taskStore';
   import { fade } from 'svelte/transition';
   
-  export let task;
+  export let task = null; // Make task optional - null means create mode
   export let show = false;
-  export let onAddTask = () => {};  // Make it optional with a default no-op function
-  let title = '';
-  let columnId = 'todo';
+  export let columnId = 'todo'; // Default column for new tasks
 
   const dispatch = createEventDispatcher();
   let isUpdating = false;
   let error = null;
   
-  let taskDetails = {
+  $: isCreateMode = !task;
+  
+  $: taskDetails = task ? {
     title: task.title || '',
     priority: task.priority || 'Medium',
     deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '',
     size: task.size || 'Medium',
     assignee: task.assignee || '',
     description: task.description || ''
+  } : {
+    title: '',
+    priority: 'Medium',
+    deadline: '',
+    size: 'Medium',
+    assignee: '',
+    description: ''
   };
 
   function close() {
@@ -27,7 +34,7 @@
     dispatch('close');
   }
 
-  async function saveChanges() {
+  async function handleSubmit() {
     isUpdating = true;
     error = null;
 
@@ -35,23 +42,21 @@
       const updates = {
         ...taskDetails,
         deadline: taskDetails.deadline ? new Date(taskDetails.deadline).toISOString() : null,
-        columnId: task.columnId // Ensure columnId is included
+        columnId: isCreateMode ? columnId : task.columnId
       };
 
-      await updateTask(task.id, updates);
-      dispatch('close');
+      if (isCreateMode) {
+        dispatch('create', updates);
+      } else {
+        await updateTask(task.id, updates);
+        dispatch('save', updates);
+      }
+      close();
     } catch (err) {
       error = err.message;
       console.error('Error updating task:', err);
     } finally {
       isUpdating = false;
-    }
-  }
-
-  function handleSubmit() {
-    if (onAddTask) {  // Check if onAddTask exists before calling
-      onAddTask(title, columnId);
-      title = '';
     }
   }
 </script>
@@ -60,7 +65,7 @@
   <div class="modal-backdrop" on:click|self={close}>
     <div class="modal-content" role="dialog" aria-modal="true">
       <header class="modal-header">
-        <h2>{task.title}</h2>
+        <h2>{isCreateMode ? 'Create New Task' : task.title}</h2>
         <button class="close-button" on:click={close}>×</button>
       </header>
 
@@ -72,7 +77,25 @@
         {/if}
 
         <div class="modal-section">
-          <h3>Details</h3>
+          {#if isCreateMode}
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input 
+                type="text" 
+                id="title" 
+                bind:value={taskDetails.title} 
+                placeholder="Enter task title..."
+              >
+            </div>
+            <div class="form-group">
+              <label for="columnId">Status</label>
+              <select id="columnId" bind:value={columnId}>
+                <option value="todo">To Do</option>
+                <option value="inProgress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+          {/if}
           <div class="form-grid">
             <div class="form-group">
               <label for="priority">Priority</label>
@@ -138,28 +161,18 @@
         </button>
         <button 
           class="primary" 
-          on:click={saveChanges}
-          disabled={isUpdating}
+          on:click={handleSubmit}
+          disabled={isUpdating || (isCreateMode && !taskDetails.title)}
         >
           {#if isUpdating}
             <span class="spinner"></span>
           {/if}
-          {isUpdating ? 'Saving...' : 'Save Changes'}
+          {isUpdating ? 'Saving...' : isCreateMode ? 'Create Task' : 'Save Changes'}
         </button>
       </footer>
     </div>
   </div>
 {/if}
-
-<div class="modal">
-  <input type="text" bind:value={title} placeholder="Task title" />
-  <select bind:value={columnId}>
-    <option value="todo">To Do</option>
-    <option value="inProgress">In Progress</option>
-    <option value="done">Done</option>
-  </select>
-  <button on:click={handleSubmit}>Add Task</button>
-</div>
 
 <style>
   .modal-backdrop {
