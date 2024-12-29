@@ -18,6 +18,15 @@
       console.error('Error loading personal data:', error);
     }
   }
+  let buttonText = 'AI Suggestions';
+  let displayedImprovementAreas = personalData?.performanceMetrics.improvementAreas || [];
+
+  async function fetchAISuggestions() {
+    buttonText = 'Generating...';
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate fetch delay
+    displayedImprovementAreas = personalData?.performanceMetrics.improvementAreas || [];
+    buttonText = 'AI Suggestions';
+  }
 
   function initializeCharts() {
     // Task Completion Pie Chart
@@ -277,8 +286,11 @@
 
     <div class="info-card improvements">
       <h2>Areas for Improvement</h2>
+      <button class="ai-suggestions-button" on:click={fetchAISuggestions}>
+        {buttonText}
+      </button>
       <ul>
-        {#each personalData?.performanceMetrics.improvementAreas || [] as area}
+        {#each displayedImprovementAreas as area}
           <li>{area}</li>
         {/each}
       </ul>
@@ -405,4 +417,26 @@
       font-size: 2rem;
     }
   }
+
+  .ai-suggestions-button {
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-suggestions-button:hover {
+    background-color: #45A049; /* Darker green */
+  }
+
+  .ai-suggestions-button:focus {
+    outline: none;
+  }
 </style>
+
