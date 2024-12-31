@@ -1,7 +1,7 @@
 <script>
   import Column from '$lib/components/Column.svelte';
   import { taskStore } from '$lib/stores/taskStore';
-  import { authStore } from '$lib/stores/authStore';
+  import { user } from '$lib/stores/userStore';
   import { onMount, createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition'; // Add this import
 
@@ -114,11 +114,10 @@
   }
 
   async function loadTasks() {
+    if (!$user) return;
+    
     try {
-      const user = $authStore.user;
-      if (!user) return;
-
-      const response = await fetch(`http://localhost:6876/tasks?userid=${user.uid}`);
+      const response = await fetch(`http://localhost:6876/tasks?userid=${$user.uid}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -168,36 +167,27 @@
     }
   }
 
-  onMount(async () => {
-    if ($authStore.user) {
-      await loadTasks();
+  onMount(() => {
+    if ($user) {
+      loadTasks();
     }
   });
 
-  $: if ($authStore.user) {
+  // Reload tasks when user changes
+  $: if ($user) {
     loadTasks();
   }
 
-  $: isAuthenticated = $authStore.user !== null;
-
   async function handleAddTask(event) {
-    if (!isAuthenticated) {
-      authError = 'Please sign in to add tasks';
-      return;
-    }
+    if (!$user) return;
+    
     try {
-      const user = $authStore.user;
-      if (!user) throw new Error('Authentication required');
-
       await taskStore.addTask({
-        title: event.detail.title,
-        columnId: event.detail.columnId,
-        userid: user.uid
+        ...event.detail,
+        userid: $user.uid
       });
-      authError = null;
     } catch (err) {
       console.error('Failed to add task:', err);
-      authError = err.message;
     }
   }
 </script>
@@ -207,16 +197,6 @@
   on:dragstart={handleDragStart} 
   on:dragend={handleDragEnd}
 >
-  {#if authError}
-    <div class="auth-error" transition:fade|local>{authError}</div>
-  {/if}
-
-  {#if !isAuthenticated}
-    <div class="auth-warning">
-      Please sign in to manage tasks
-    </div>
-  {/if}
-
   {#if error}
     <div class="error-message">{error}</div>
   {/if}

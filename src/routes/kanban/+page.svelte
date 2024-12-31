@@ -1,10 +1,9 @@
 <script>
   import KanbanBoard from '$lib/components/KanbanBoard.svelte';
   import { onMount } from 'svelte';
-  import { getAuth } from 'firebase/auth';
-  import { taskStore } from '$lib/stores/taskStore';
-  import { authStore } from '$lib/stores/authStore';
+  import { user, isLoading } from '$lib/stores/userStore';
   import { goto } from '$app/navigation';
+  import { taskStore } from '$lib/stores/taskStore';
 
   let columns = [
     { id: 'todo', title: 'To Do' },
@@ -56,28 +55,32 @@
     // Pass to KanbanBoard component
   }
 
-  onMount(async () => {
-    if ($authStore.loading) return;
-    
-    if (!$authStore.user) {
-      goto('/login?redirect=/kanban');
-      return;
-    }
+  onMount(() => {
+    // Redirect if not authenticated
+    const unsubscribe = user.subscribe((userData) => {
+      if (!$isLoading && !userData) {
+        goto('/login?redirect=/kanban');
+      }
+    });
 
-    await fetchTasks($authStore.user.uid);
+    return () => unsubscribe();
   });
 </script>
 
-<div class="kanban-page">
-  <div class="logo-container">
-    <img 
-      src="src\lib\assets\neotaskmaster-logo.png" 
-      alt="NeoTaskMaster"
-      class="logo"
-    />
+{#if $isLoading}
+  <div class="loading">Loading...</div>
+{:else if $user}
+  <div class="kanban-page">
+    <div class="logo-container">
+      <img 
+        src="src\lib\assets\neotaskmaster-logo.png" 
+        alt="NeoTaskMaster"
+        class="logo"
+      />
+    </div>
+    <KanbanBoard />
   </div>
-  <KanbanBoard />
-</div>
+{/if}
 
 <style>
   .kanban-page {
