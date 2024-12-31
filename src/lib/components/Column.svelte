@@ -2,11 +2,10 @@
   import Task from '$lib/components/Task.svelte';
   import { createEventDispatcher, onDestroy } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { addTask } from '$lib/stores/taskStore';
+  import { taskStore } from '$lib/stores/taskStore';
 
-  // Define required props
   export let column;
-  export let tasks = [];  // Provide default empty array
+  export let tasks = [];
 
   const dispatch = createEventDispatcher();
   let newTaskTitle = '';
@@ -18,10 +17,15 @@
   let inputTimeout;
   let isDropTarget = false;
 
-  $: columnTasks = tasks || [];  // Ensure we always have an array
+  $: columnTasks = tasks || [];
   $: taskCount = columnTasks.length;
 
-  console.log(`Column ${column.id} tasks:`, columnTasks); // Debug log
+  taskStore.subscribe(state => {
+    columnTasks = state.tasks.filter(task => task.columnId === column.id) || [];
+    taskCount = columnTasks.length;
+  });
+
+  console.log(`Column ${column.id} tasks:`, columnTasks);
 
   async function handleAddTask(title) {
     if (!title?.trim()) return;
@@ -95,7 +99,7 @@
       if (!newTaskTitle.trim()) {
         isAddingTask = false;
       }
-    }, 5000); // 5 seconds timeout
+    }, 5000);
   }
 
   function clearInputTimeout() {

@@ -15,7 +15,7 @@
 
   // Subscribe to taskStore
   taskStore.subscribe(value => {
-    tasks = value;
+    tasks = value.tasks || [];
   });
 
   async function fetchTasks(userid) {
@@ -78,7 +78,7 @@
         class="logo"
       />
     </div>
-    <KanbanBoard />
+    <KanbanBoard {columns} {tasks} />
   </div>
 {/if}
 

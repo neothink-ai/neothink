@@ -3,23 +3,21 @@
   import { taskStore } from '$lib/stores/taskStore';
   import { user } from '$lib/stores/userStore';
   import { onMount, createEventDispatcher } from 'svelte';
-  import { fade } from 'svelte/transition'; // Add this import
+  import { fade } from 'svelte/transition';
 
-  // Declare props with default values
   export let columns = [
     { id: 'todo', title: 'To Do' },
     { id: 'inProgress', title: 'In Progress' },
     { id: 'done', title: 'Done' }
   ];
 
-  let tasks = [];  // Local state, not a prop
+  let tasks = [];
   let loading = false;
   let error = null;
   let authError = null;
 
   const dispatch = createEventDispatcher();
 
-  // Subscribe to taskStore
   taskStore.subscribe(state => {
     tasks = state.tasks || [];
     loading = state.loading;
@@ -36,7 +34,6 @@
     isDragging = false;
   }
 
-  // Task operations
   async function addTask(event) {
     try {
       await taskStore.addTask(event.detail);
@@ -49,7 +46,6 @@
     const { taskId, newColumnId, taskData } = event.detail;
     
     try {
-      // Optimistically update UI
       tasks = tasks.map(t => 
         t.id === taskId ? { ...t, columnId: newColumnId, state: newColumnId } : t
       );
@@ -70,14 +66,12 @@
       });
 
       if (!response.ok) {
-        // Revert on failure
         tasks = tasks.map(t => 
           t.id === taskId ? { ...t, columnId: taskData.columnId, state: taskData.state } : t
         );
         throw new Error(`Failed to update task: ${response.statusText}`);
       }
 
-      // Refresh tasks to ensure consistency
       await loadTasks();
     } catch (error) {
       console.error('Move task error:', error);
@@ -101,12 +95,10 @@
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      // Remove from local state
       tasks = tasks.filter(task => task.id !== taskId);
       
       console.log('Task deleted successfully');
       
-      // Refresh tasks from server
       await loadTasks();
     } catch (error) {
       console.error('Failed to delete task:', error);
@@ -122,7 +114,7 @@
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Raw tasks data:', data);  // Debug log
+      console.log('Raw tasks data:', data);
 
       if (Array.isArray(data)) {
         const processedTasks = data.map(task => ({
@@ -161,7 +153,7 @@
         throw new Error('Failed to update task');
       }
 
-      await loadTasks(); // Refresh tasks
+      await loadTasks();
     } catch (error) {
       console.error('Failed to update task:', error);
     }
@@ -173,7 +165,6 @@
     }
   });
 
-  // Reload tasks when user changes
   $: if ($user) {
     loadTasks();
   }
@@ -224,7 +215,7 @@
     gap: 12px;
     padding: 24px;
     overflow-x: auto;
-    height: 100%; /* Changed from calc(100vh - 48px) */
+    height: 100%;
     background-color: #f4f5f7;
     transition: background-color 0.2s ease;
     align-items: flex-start;

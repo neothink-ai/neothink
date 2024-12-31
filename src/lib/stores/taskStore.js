@@ -20,15 +20,11 @@ function createTaskStore() {
         setTasks: (tasks) => {
             update(state => ({ ...state, tasks, loading: false }));
         },
-        set: (tasks) => {
-            update(state => ({ ...state, tasks }));
-        },
         addTask: async (taskData) => {
             try {
                 const user = await requireAuth();
                 const now = new Date().toISOString();
                 
-                // Ensure all required fields are present with proper types
                 const fullTaskData = {
                     title: String(taskData.title || ''),
                     columnId: String(taskData.columnId || 'todo'),
@@ -49,8 +45,8 @@ function createTaskStore() {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    mode: 'cors', // Add this
-                    credentials: 'omit', // Change from 'include' to 'omit'
+                    mode: 'cors',
+                    credentials: 'omit',
                     body: JSON.stringify(fullTaskData)
                 });
 
@@ -68,9 +64,14 @@ function createTaskStore() {
                     ...fullTaskData
                 };
 
-                update(tasks => [...tasks, processedTask]);
+                update(state => ({
+                    ...state,
+                    tasks: [...state.tasks, processedTask],
+                    loading: false
+                }));
                 return processedTask;
             } catch (error) {
+                update(state => ({ ...state, error: error.message, loading: false }));
                 console.error('Failed to add task:', error);
                 throw new Error(error.message || 'Failed to add task');
             }
@@ -84,9 +85,12 @@ function createTaskStore() {
                     body: JSON.stringify(updates)
                 });
                 if (!response.ok) throw new Error('Failed to update task');
-                update(tasks => tasks.map(task => 
-                    task.id === id ? { ...task, ...updates } : task
-                ));
+                update(state => ({
+                    ...state,
+                    tasks: state.tasks.map(task => 
+                        task.id === id ? { ...task, ...updates } : task
+                    )
+                }));
             } catch (error) {
                 throw error;
             }
@@ -97,7 +101,10 @@ function createTaskStore() {
                 await fetch(`http://localhost:6876/tasks/${id}`, {
                     method: 'DELETE'
                 });
-                update(tasks => tasks.filter(task => task.id !== id));
+                update(state => ({
+                    ...state,
+                    tasks: state.tasks.filter(task => task.id !== id)
+                }));
             } catch (error) {
                 throw error;
             }
