@@ -5,8 +5,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 export const user = writable(null);
 export const isLoading = writable(true); // Initialize isLoading to true
 
-// Listen for auth state changes
-onAuthStateChanged(auth, (firebaseUser) => {
+// Use the singleton auth instance
+const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
   if (firebaseUser) {
     user.set({
       uid: firebaseUser.uid,
@@ -18,3 +18,10 @@ onAuthStateChanged(auth, (firebaseUser) => {
   }
   isLoading.set(false); // Set isLoading to false after the user state is determined
 });
+
+// Cleanup subscription on app unmount
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    unsubscribe();
+  });
+}
