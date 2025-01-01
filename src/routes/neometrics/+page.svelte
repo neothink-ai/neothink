@@ -12,11 +12,11 @@
     main {
         position: relative;
         transition: transform 0.3s ease;
+        overflow-y: auto; /* Allow vertical scrolling */
+        max-height: 100vh; /* Ensure it doesn't exceed viewport height */
     }
 
     .welcome {
-        position: fixed;
-        top: 10px;
         margin-top: 20px;
         left: 350px;
         font-family: 'Open Sauce', sans-serif;
@@ -36,8 +36,6 @@
     .exclamation {
         color: black;
     }
-
-
 </style>
 
 <main>

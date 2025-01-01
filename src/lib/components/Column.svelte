@@ -31,21 +31,23 @@
     if (!title?.trim()) return;
     
     try {
-        dispatch('addTask', {
-            title,
-            columnId: column.id,
-            state: column.id,
-            priority: 'Medium',
-            size: 'Medium',
-            deadline: null,
-            assignee: null,
-            assigned_time: new Date().toISOString(),
-            completed_time: null
-        });
-        newTaskTitle = '';
-        isAddingTask = false;
+      const newTask = {
+        title,
+        columnId: column.id,
+        state: column.id,
+        priority: 'Medium',
+        size: 'Medium',
+        deadline: null,
+        assignee: null,
+        assigned_time: new Date().toISOString(),
+        completed_time: null
+      };
+      dispatch('addTask', newTask);
+      columnTasks = [...columnTasks, newTask]; // Update columnTasks array
+      newTaskTitle = '';
+      isAddingTask = false;
     } catch (error) {
-        console.error('Failed to add task:', error);
+      console.error('Failed to add task:', error);
     }
   }
 

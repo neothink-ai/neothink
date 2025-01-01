@@ -35,7 +35,7 @@
   async function handleAddTask(event) {
     const { title, columnId } = event.detail;
     try {
-      await taskStore.addTask({
+      const newTask = {
         title,
         columnId,
         state: columnId,
@@ -45,7 +45,9 @@
         assignee: null,
         assigned_time: new Date().toISOString(),
         completed_time: null
-      });
+      };
+      await taskStore.addTask(newTask);
+      tasks = [...tasks, newTask]; // Update tasks array
     } catch (error) {
       console.error('Failed to add task:', error);
     }

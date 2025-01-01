@@ -247,61 +247,76 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </svelte:head>
 
-<div>
-  <img src="/assets/neothink1.png" alt="Neothink Logo" class="neothink-logo" />
-</div>
+<div class="content-wrapper">
+  <div>
+    <img src="/assets/neothink1.png" alt="Neothink Logo" class="neothink-logo" />
+  </div>
 
-<div class="dashboard">
-  <img src="/assets/neometrics1.png" alt="Neometrics Logo" class="neometrics-logo">
-  <h1 class="dashboard-title">Performance Dashboard - {personalData?.name}</h1>
-  
-  <div class="metrics-grid">
-    <div class="chart-card">
-      <canvas bind:this={taskChartCanvas}></canvas>
-    </div>
-
-    <div class="chart-card">
-      <canvas bind:this={timeChartCanvas}></canvas>
-    </div>
-
-    <div class="chart-card completion-rate">
-      <canvas bind:this={completionRateCanvas}></canvas>
-      <div class="completion-rate-label">
-        {personalData?.performanceMetrics.completionRate}%
+  <div class="dashboard">
+    <img src="/assets/neometrics1.png" alt="Neometrics Logo" class="neometrics-logo">
+    <h1 class="dashboard-title">Performance Dashboard - {personalData?.name}</h1>
+    
+    <div class="metrics-grid">
+      <div class="chart-card">
+        <canvas bind:this={taskChartCanvas}></canvas>
       </div>
-    </div>
 
-    <div class="chart-card">
-      <canvas bind:this={taskTimeCanvas}></canvas>
-    </div>
+      <div class="chart-card">
+        <canvas bind:this={timeChartCanvas}></canvas>
+      </div>
 
-    <div class="info-card achievements">
-      <h2>Top Achievements</h2>
-      <ul>
-        {#each personalData?.performanceMetrics.topAchievements || [] as achievement}
-          <li>{achievement}</li>
-        {/each}
-      </ul>
-    </div>
+      <div class="chart-card completion-rate">
+        <canvas bind:this={completionRateCanvas}></canvas>
+        <div class="completion-rate-label">
+          {personalData?.performanceMetrics.completionRate}%
+        </div>
+      </div>
 
-    <div class="info-card improvements">
-      <h2>Areas for Improvement</h2>
-      <button class="ai-suggestions-button" on:click={fetchAISuggestions}>
-        {buttonText}
-      </button>
-      <ul>
-        {#each displayedImprovementAreas as area}
-          <li>{area}</li>
-        {/each}
-      </ul>
+      <div class="chart-card">
+        <canvas bind:this={taskTimeCanvas}></canvas>
+      </div>
+
+      <div class="info-card achievements">
+        <h2>Top Achievements</h2>
+        <ul>
+          {#each personalData?.performanceMetrics.topAchievements || [] as achievement}
+            <li>{achievement}</li>
+          {/each}
+        </ul>
+      </div>
+
+      <div class="info-card improvements">
+        <h2>Areas for Improvement</h2>
+        <button class="ai-suggestions-button" on:click={fetchAISuggestions}>
+          {buttonText}
+        </button>
+        <ul>
+          {#each displayedImprovementAreas as area}
+            <li>{area}</li>
+          {/each}
+        </ul>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
+  :global(html, body) {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto; /* Ensure vertical scrolling */
+  }
+
   :global(body) {
     background-color: #F5F7FA;
     font-family: 'Open Sans', sans-serif;
+    overflow-y: scroll; /* Enable vertical scrolling */
+  }
+
+  .content-wrapper {
+    height: 100%;
+    overflow-y: auto; /* Ensure the content can scroll */
   }
 
   .dashboard {
@@ -313,18 +328,18 @@
 
   .neothink-logo {
     position: absolute;
-        top: 6px;
-        left: 20px;
-        width: 200px;
-        height: auto;
+    top: 6px;
+    left: 20px;
+    width: 200px;
+    height: auto;
   }
 
   .neometrics-logo {
     position: absolute;
-        top: 1px;
-        left: 65px;
-        width: 230px;
-        height: auto;
+    top: 1px;
+    left: 65px;
+    width: 230px;
+    height: auto;
   }
 
   .dashboard-title {
