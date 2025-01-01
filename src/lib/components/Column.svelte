@@ -43,7 +43,6 @@
         completed_time: null
       };
       dispatch('addTask', newTask);
-      columnTasks = [...columnTasks, newTask]; // Update columnTasks array
       newTaskTitle = '';
       isAddingTask = false;
     } catch (error) {

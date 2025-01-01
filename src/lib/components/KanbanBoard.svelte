@@ -37,6 +37,7 @@
   async function addTask(event) {
     try {
       await taskStore.addTask(event.detail);
+      await loadTasks(); // Fetch updated tasks after adding
     } catch (err) {
       console.error('Failed to add task:', err);
     }
@@ -72,7 +73,7 @@
         throw new Error(`Failed to update task: ${response.statusText}`);
       }
 
-      await loadTasks();
+      await loadTasks(); // Fetch updated tasks after moving
     } catch (error) {
       console.error('Move task error:', error);
     }
@@ -99,7 +100,7 @@
       
       console.log('Task deleted successfully');
       
-      await loadTasks();
+      await loadTasks(); // Fetch updated tasks after deletion
     } catch (error) {
       console.error('Failed to delete task:', error);
     }
@@ -153,7 +154,7 @@
         throw new Error('Failed to update task');
       }
 
-      await loadTasks();
+      await loadTasks(); // Fetch updated tasks after updating
     } catch (error) {
       console.error('Failed to update task:', error);
     }
@@ -177,6 +178,7 @@
         ...event.detail,
         userid: $user.uid
       });
+      await loadTasks(); // Fetch updated tasks after adding
     } catch (err) {
       console.error('Failed to add task:', err);
     }
@@ -244,5 +246,11 @@
     border-radius: 3px;
     margin-bottom: 16px;
     text-align: center;
+  }
+
+  .error-message {
+    color: #ff0000;
+    text-align: center;
+    margin-bottom: 16px;
   }
 </style>

@@ -47,7 +47,7 @@
         completed_time: null
       };
       await taskStore.addTask(newTask);
-      tasks = [...tasks, newTask]; // Update tasks array
+      await fetchTasks($user.uid); // Fetch updated tasks after adding
     } catch (error) {
       console.error('Failed to add task:', error);
     }
@@ -62,6 +62,8 @@
     const unsubscribe = user.subscribe((userData) => {
       if (!$isLoading && !userData) {
         goto('/login?redirect=/kanban');
+      } else if (userData) {
+        fetchTasks(userData.uid); // Initial fetch of tasks
       }
     });
 
@@ -80,7 +82,7 @@
         class="logo"
       />
     </div>
-    <KanbanBoard {columns} {tasks} />
+    <KanbanBoard {columns} {tasks} on:addTask={handleAddTask} />
   </div>
 {/if}
 
