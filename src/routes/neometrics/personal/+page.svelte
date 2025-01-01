@@ -309,6 +309,7 @@
     max-width: 1400px;
     margin: 0 auto;
     position: relative;
+    overflow-y: auto; /* Ensure the dashboard itself can scroll */
   }
 
   .neothink-logo {
@@ -437,6 +438,11 @@
 
   .ai-suggestions-button:focus {
     outline: none;
+  }
+
+  main {
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100vh; /* Ensure it takes the full viewport height */
   }
 </style>
 

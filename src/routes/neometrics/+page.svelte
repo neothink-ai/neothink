@@ -12,6 +12,8 @@
     main {
         position: relative;
         transition: transform 0.3s ease;
+        overflow-y: auto; /* Enable vertical scrolling */
+        height: 100vh; /* Ensure it takes the full viewport height */
     }
 
     .welcome {
@@ -37,6 +39,9 @@
         color: black;
     }
 
+    .main-content {
+        padding: 20px; /* Add padding to the main content */
+    }
 
 </style>
 
