@@ -184,24 +184,30 @@
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(8px);
     display: flex;
-    justify-content: flex-end;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
     z-index: 1000;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .modal-content {
     background: #ffffff;
-    height: 100%;
+    height: auto;
     width: 480px;
+    max-width: 90%;
     display: flex;
     flex-direction: column;
-    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px; /* Increased border-radius for more rounded edges */
+    overflow: hidden;    /* Ensure inner elements respect rounded corners */
+    animation: fadeInModal 0.3s ease-out;
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+    transform: scale(0.9);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   }
 
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+  @keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
 
   .modal-header {
