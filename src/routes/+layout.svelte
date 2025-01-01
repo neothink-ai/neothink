@@ -19,7 +19,7 @@
   });
 
   // Define routes that should use CommonLayout
-  $: showCommonLayout = ['/home', '/teams', '/about', '/neotaskmaster', '/kanban', '/neometrics']
+  $: showCommonLayout = ['/home', '/teams', '/about', '/neotaskmaster', '/kanban', '/neometrics', '/neometrics/team', '/neometrics/personal', '/project-management']
     .some(route => $page.url.pathname.startsWith(route));
 
   // Extract the page type from the URL
