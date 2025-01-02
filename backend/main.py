@@ -7,19 +7,18 @@ from database import Database
 from bson.json_util import dumps
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-from routers.kanban import router as tasks_router  # Changed from tasks_endpoints to kanban
+from routers import kanban, tasker  # Import both routers
+import uvicorn
 
-app = FastAPI()
+app = FastAPI(debug=True)  # Enable debug mode
 
-# Update CORS middleware with more specific configuration
+# CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174", "http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*", "Content-Type", "Authorization"],
-    expose_headers=["*"],
-    max_age=600,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Remove the direct client connection and use Database class instead
@@ -165,12 +164,26 @@ async def update_profile(user_id: str, profile: UserProfileUpdate):
         # print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
-app.include_router(tasks_router)
+# Include both routers
+app.include_router(tasker.router, prefix="/tasker")
+app.include_router(kanban.router, prefix="/tasks")
+
+# Add debug endpoint
+@app.get("/debug/routes")
+async def debug_routes():
+    routes = [
+        {"path": route.path, "name": route.name, "methods": route.methods}
+        for route in app.routes
+    ]
+    return {"routes": routes}
+
+@app.get("/")
+async def root():
+    return {"message": "API is running"}
 
 @app.on_event("shutdown")
 async def shutdown_event():
     Database.close_connection()
     
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=6876)
+    uvicorn.run("main:app", host="127.0.0.1", port=6876, reload=True, log_level="debug")

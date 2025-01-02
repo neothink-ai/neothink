@@ -2,6 +2,7 @@
   import { fade } from 'svelte/transition';
 
   export let appType = 'neoplan'; // Default value
+  export let currentApp = 'neothink';
 
   let activeItem = 'home';
   let isSidebarOpen = false;
@@ -9,6 +10,21 @@
   function toggleSidebar() {
     isSidebarOpen = !isSidebarOpen;
   }
+
+  const routes = {
+    neothink: [
+      // ...existing routes...
+    ],
+    neotaskmaster: [
+      // ...existing routes...
+      { path: '/neoplan', icon: '🤖', label: 'AI Planner' },
+    ],
+    neoplan: [
+      { path: '/neoplan', icon: '🤖', label: 'AI Planner' },
+      { path: '/kanban', icon: '📋', label: 'Kanban' },
+    ],
+    // ...existing code...
+  };
 </script>
 
 <div class="overlay {isSidebarOpen ? 'open' : ''}" on:click={toggleSidebar}></div>

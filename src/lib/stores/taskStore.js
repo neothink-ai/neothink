@@ -18,9 +18,10 @@ function createTaskStore() {
     return {
         subscribe,
         setTasks: (tasks) => {
-            update(state => ({ ...state, tasks, loading: false }));
+            set({ tasks, loading: false, error: null });
         },
         addTask: async (taskData) => {
+            update(state => ({ ...state, loading: true }));
             try {
                 const user = await requireAuth();
                 const now = new Date().toISOString();
@@ -107,6 +108,18 @@ function createTaskStore() {
                 }));
             } catch (error) {
                 throw error;
+            }
+        },
+        loadTasks: async (userId) => {
+            update(state => ({ ...state, loading: true }));
+            try {
+                const response = await fetch(`http://localhost:6876/tasks?userid=${userId}`);
+                if (!response.ok) throw new Error('Failed to load tasks');
+                
+                const tasks = await response.json();
+                set({ tasks, loading: false, error: null });
+            } catch (error) {
+                set({ tasks: [], loading: false, error: error.message });
             }
         }
     };
